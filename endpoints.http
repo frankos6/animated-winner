@@ -1,1 +1,6 @@
+###
 GET localhost:245 /
+
+###
+GET localhost:245 /auth
+Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==

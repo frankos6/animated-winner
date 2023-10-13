@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 class MainPage extends StatefulWidget {
-  const MainPage({super.key});
+  final data;
+  const MainPage({super.key, required this.data});
 
   @override
   State<MainPage> createState() => _MainPageState();

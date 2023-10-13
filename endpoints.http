@@ -4,3 +4,16 @@ GET localhost:245 /
 ###
 GET localhost:245 /auth
 Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==
+
+###
+POST localhost:245 /user/register
+Content-Type: application/json
+
+{
+  "username":"bgt",
+  "password":"chuj23"
+}
+
+###
+POST localhost:245 /device/register
+Accept: application/json

@@ -17,3 +17,23 @@ Content-Type: application/json
 ###
 POST localhost:245 /device/register
 Accept: application/json
+
+###
+GET localhost:245 /device/list
+Accept: application/json
+Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==
+
+###
+GET localhost:245 /device/1
+Accept: application/json
+Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==
+
+###
+GET localhost:245 /device/1/alerts
+Accept: application/json
+Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==
+
+###
+GET localhost:245 /device/data/1
+Accept: application/json
+Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==

@@ -217,6 +217,31 @@ app.get('/auth',(req, res)=>{
     return res.status(200).send(`Your credentials are correct!\nYou are logged in as ${req.user.username}.`)
 })
 
+app.get('/device/list',async (req,res)=>{
+    const devices = await Device.findAll();
+    return res.status(200).send(devices.map(d=>d.toJSON()))
+})
+
+
+app.get('device/alerts/:ids',async (req, res)=>{
+    const device = await Device.findOne({ where: { id: req.params.ids } })
+    if (!device) return res.status(404).send(`A device with id ${req.params.id} does not exist`)
+    return res.status(200).send((await Alert.findAll({where: { id: req.params.id }})).map(e=>e.toJSON()))
+})
+
+app.get('device/data/:ida',async (req,res)=>{
+    const device = await Device.findOne({ where: { id: req.params.ida } })
+    if (!device) return res.status(404).send(`A device with id ${req.params.id} does not exist`)
+    return res.status(200).send((await DeviceData.findAll({where: {id: req.params.id}, limit: req.query.limit || 10})).map(e=>e.toJSON()))
+})
+
+app.get('/device/:id/',async (req, res)=>{
+    const device = await Device.findOne({ where: { id: req.params.id } })
+    if (!device) return res.status(404).send(`A device with id ${req.params.id} does not exist`)
+    else return res.status(200).send(device.toJSON())
+})
+
+app.get('/xd',(req,res)=>res.send('xd'))
 
 // error handler
 app.use((err, req, res, next)=>{

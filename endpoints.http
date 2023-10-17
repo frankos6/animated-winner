@@ -10,7 +10,7 @@ POST localhost:245 /user/register
 Content-Type: application/json
 
 {
-  "username":"bgt",
+  "username":"device7",
   "password":"chuj23"
 }
 
@@ -34,6 +34,6 @@ Accept: application/json
 Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==
 
 ###
-GET localhost:245 /device/data/1
+GET localhost:245 /device/1/data?limit=0
 Accept: application/json
 Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==

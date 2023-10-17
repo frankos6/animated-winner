@@ -1,8 +1,21 @@
-import express from "express";
 import {Sequelize, DataTypes} from "sequelize";
+import restify from "restify";
+import errors from "restify-errors";
 
-const app = express();
-app.use(express.json())
+const app = restify.createServer();
+app.pre(restify.pre.sanitizePath())
+app.use(restify.plugins.bodyParser({rejectUnknown: true}))
+app.use(restify.plugins.throttle({
+    burst: 10,
+    rate: 2,
+    ip: true,
+    overrides: {
+        '127.0.0.1': {
+            rate: 0
+        }
+    }
+}))
+app.use(restify.plugins.authorizationParser())
 const sequelize = new Sequelize({
     dialect:'sqlite',
     storage:'database.db'
@@ -143,30 +156,27 @@ const APILog = sequelize.define('APILog',{
 
 await sequelize.sync({alter: true})
 
-app.use((req, res, next) => {
-    res.on('finish', async () => {
-        console.log(`endpoint ${req.path} - response code ${res.statusCode} ${res.body || ''}`)
-        await APILog.create({endpoint:req.path, responseStatus:res.statusCode})
-    })
-    next()
+app.on('after',async (req,res,route)=>{
+    console.log(`endpoint ${route ? route.path : req.getPath()} - response code ${res.statusCode} ${res.body || ''}`)
+    await APILog.create({endpoint: route ? route.path : req.getPath(), responseStatus: res.statusCode})
 })
 // endpoints without auth
-app.get('/',(req,res)=>{
+app.get('/',async (req,res)=>{
     res.send('hello world!')
 });
 
 app.post('/device/register', async (req, res)=>{
+    // TODO: use transaction
     const devices = await Device.count()
     const newUser = await User.create({username: `device${devices}`, password: Math.random().toString(36).substring(2,10), isDevice: true})
-    const newDevice = await Device.create({name: newUser.username, UserId: newUser.id})
-    return res.status(201).send({username: newUser.username, password: newUser.password})
+    await Device.create({name: newUser.username, UserId: newUser.id})
+    return res.send(201,{username: newUser.username, password: newUser.password})
 })
 
 app.post('/user/register', async (req, res)=>{
     const {username, password} = req.body
     if (!username || !password) {
-        res.status(400).send('You need to provide a username and password')
-        return
+        throw new errors.BadRequestError('You need to provide a username and password')
     }
     const users = await User.findAll({
         where: {
@@ -174,78 +184,64 @@ app.post('/user/register', async (req, res)=>{
         }
     })
     if (users.length !== 0) {
-        res.status(400).send('An user with this username already exists')
-        return
+        throw new errors.ConflictError('An user with this username already exists')
     }
-    const newUser = await User.create({username, password})
-    return res.status(201).send('User created')
+    if (username.toLowerCase().startsWith('device')) {
+        throw new errors.ConflictError('This username is reserved for devices')
+    }
+    await User.create({username, password})
+    return res.send(201,'User created')
 })
 
-// endpoints with auth
-
-app.use(async (req, res, next)=>{
-    if (!req.headers.authorization) {
-        res.status(401).send("No credentials provided")
-        return
-    }
-    const token = req.headers.authorization.split(' ')[1]
-    if (!token || token === '') {
-        res.status(401).send("No credentials provided")
-        return
-    }
-    const [username, password] = atob(token).split(':');
+// auth handler
+const authFn = async (req, res)=>{
+    if (!req.username)
+        throw new errors.InvalidCredentialsError('No credentials provided')
     const users = await User.findAll({
         where: {
-            username
+            username: req.username
         }
     })
-    if (users.length !== 1) {
-        res.status(401).send("Invalid credentials")
-        return
-    }
-    if (users[0].password !== password) {
-        res.status(401).send("Invalid password")
-        return
-    }
+    if (users.length !== 1)
+        throw new errors.InvalidCredentialsError()
+    if (!req.authorization.basic)
+        throw new errors.InvalidHeaderError('Invalid authorization scheme')
+    if (users[0].password !== req.authorization.basic.password)
+        throw new errors.InvalidCredentialsError('Invalid password')
+
     req.user = users[0];
-    next()
-})
+}
 
 // endpoints with auth
 
-app.get('/auth',(req, res)=>{
-    return res.status(200).send(`Your credentials are correct!\nYou are logged in as ${req.user.username}.`)
-})
+app.get('/auth',[authFn, async (req, res)=>{
+    return res.send(`Your credentials are correct!\nYou are logged in as ${req.username}.`)
+}])
 
-app.get('/device/list',async (req,res)=>{
+app.get('/device/list',[authFn, async (req,res)=>{
     const devices = await Device.findAll();
-    return res.status(200).send(devices.map(d=>d.toJSON()))
-})
+    return res.send(devices.map(d=>d.toJSON()))
+}])
 
-
-app.get('device/alerts/:ids',async (req, res)=>{
-    const device = await Device.findOne({ where: { id: req.params.ids } })
-    if (!device) return res.status(404).send(`A device with id ${req.params.id} does not exist`)
-    return res.status(200).send((await Alert.findAll({where: { id: req.params.id }})).map(e=>e.toJSON()))
-})
-
-app.get('device/data/:ida',async (req,res)=>{
-    const device = await Device.findOne({ where: { id: req.params.ida } })
-    if (!device) return res.status(404).send(`A device with id ${req.params.id} does not exist`)
-    return res.status(200).send((await DeviceData.findAll({where: {id: req.params.id}, limit: req.query.limit || 10})).map(e=>e.toJSON()))
-})
-
-app.get('/device/:id/',async (req, res)=>{
+app.get('/device/:id',[authFn, async (req, res)=>{
+    if (!req.params.id || req.params.id === '') throw new errors.MissingParameterError('You need to provide a device id')
     const device = await Device.findOne({ where: { id: req.params.id } })
-    if (!device) return res.status(404).send(`A device with id ${req.params.id} does not exist`)
-    else return res.status(200).send(device.toJSON())
-})
+    if (!device) throw new errors.NotFoundError(`A device with id ${req.params.id} does not exist`)
+    else return res.send(device.toJSON())
+}])
 
-app.get('/xd',(req,res)=>res.send('xd'))
+app.get('/device/:id/alerts',[authFn, async (req, res) => {
+    if (!req.params.id || req.params.id === '') throw new errors.MissingParameterError('You need to provide a device id')
+    const device = await Device.findOne({ where: { id: req.params.id } })
+    if (!device) throw new errors.NotFoundError(`A device with id ${req.params.id} does not exist`)
+    return res.send((await Alert.findAll({where: { id: req.params.id }})).map(e=>e.toJSON()))
+}])
 
-// error handler
-app.use((err, req, res, next)=>{
-    console.log(err.stack)
-    res.status(500).send(err.message)
-})
+app.get('/device/:id/data',[authFn, async (req, res)=>{
+    if (!req.params.id || req.params.id === '') throw new errors.MissingParameterError('You need to provide a device id')
+    const device = await Device.findOne({ where: { id: req.params.id } })
+    if (!device) throw new errors.NotFoundError(`A device with id ${req.params.id} does not exist`)
+    return res.send((await DeviceData.findAll({where: {id: req.params.id}, limit: req.query.limit || 10})).map(e=>e.toJSON()))
+}])
+
 app.listen(245,()=>console.log(`listening on port 245`))

@@ -17,10 +17,10 @@ class _LoadingState extends State<Loading> {
     DataService dataService = DataService();
 
     await dataService.getDevices();
-    List<Device> devices = DataService.devices;
+    await dataService.getAlerts();
 
     if (context.mounted) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage(data: devices)));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));
     }
   }
 

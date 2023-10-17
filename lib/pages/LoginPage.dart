@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mobile_app/models/DTO/UserLoginDTO.dart';
 import 'package:mobile_app/pages/LoadingPage.dart';
 import 'package:mobile_app/services/Themes.dart';
@@ -17,6 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _passwordController = TextEditingController();
   bool showErrorMessage = false;
   bool showRegisterMessage = false;
+  bool buttonsEnabled = true;
 
   @override
   Widget build(BuildContext context) {
@@ -53,57 +55,81 @@ class _LoginPageState extends State<LoginPage> {
                   autocorrect: false,
                   enableSuggestions: false,
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    showErrorMessage = false;
-                    showRegisterMessage = false;
-                    UserService userService = UserService();
+                Visibility(
+                  visible: buttonsEnabled,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      setState(() {
+                        showErrorMessage = false;
+                        showRegisterMessage = false;
+                        buttonsEnabled = false;
+                      });
+                      UserService userService = UserService();
 
-                    UserLoginDTO userLogin = UserLoginDTO(
-                        login: _loginController.text,
-                        password: _passwordController.text);
+                      UserLoginDTO userLogin = UserLoginDTO(
+                          login: _loginController.text,
+                          password: _passwordController.text);
 
-                    await userService.getUserData(userLogin);
-                    if (UserService.loggedIn) {
-                      if (context.mounted) {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const Loading()));
+                      await userService.getUserData(userLogin);
+                      if (UserService.loggedIn) {
+                        if (context.mounted) {
+                          Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => const Loading()));
+                        }
+                      } else {
+                        setState(() {
+                          showErrorMessage = true;
+                          buttonsEnabled = true;
+                        });
                       }
-                    }else{
-                      setState(() {
-                        showErrorMessage = true;
-                      });
-                    }
-                  },
-                  child: const Text("Zaloguj"),
+                    },
+                    child: const Text("Zaloguj"),
+                  ),
                 ),
-                ElevatedButton(
-                  onPressed: () async {
-                    showErrorMessage = false;
-                    showRegisterMessage = false;
-                    UserService userService = UserService();
-
-                    UserLoginDTO userRegister = UserLoginDTO(
-                        login: _loginController.text,
-                        password: _passwordController.text);
-
-                    await userService.registerUser(userRegister);
-                    if (UserService.registered) {
+                Visibility(
+                  visible: buttonsEnabled,
+                  child: ElevatedButton(
+                    onPressed: () async {
                       setState(() {
-                        showRegisterMessage = true;
+                        showErrorMessage = false;
+                        showRegisterMessage = false;
+                        buttonsEnabled = false;
                       });
-                    }
-                  },
-                  child: const Text("Zarejestruj"),
+                      UserService userService = UserService();
+
+                      UserLoginDTO userRegister = UserLoginDTO(
+                          login: _loginController.text,
+                          password: _passwordController.text);
+
+                      await userService.registerUser(userRegister);
+                      if (UserService.registered) {
+                        setState(() {
+                          showRegisterMessage = true;
+                          buttonsEnabled = true;
+                        });
+                      }
+                    },
+                    child: const Text("Zarejestruj"),
+                  ),
                 ),
-                if(showErrorMessage)
-                  const Text("Nieprawidłowy login lub hasło!", style: TextStyle(color: Colors.red)),
-                if(showRegisterMessage)
-                  const Text("Pomyślnie zarejestrowano. Możesz się teraz zalogować",
+                if (showErrorMessage)
+                  const Text("Nieprawidłowy login lub hasło!",
+                      style: TextStyle(color: Colors.red)),
+                if (showRegisterMessage)
+                  const Text(
+                      "Pomyślnie zarejestrowano. Możesz się teraz zalogować",
                       style: TextStyle(color: Colors.green)),
-
+                Visibility(
+                    visible: !buttonsEnabled,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 25),
+                      child: const SpinKitRing(
+                        color: Colors.blue,
+                      ),
+                    )
+                )
               ],
             ),
           ),

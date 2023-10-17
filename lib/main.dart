@@ -4,6 +4,7 @@ import 'pages/LoginPage.dart';
 
 void main() {
   runApp(const MaterialApp(
-      home: LoginPage())
+    title: "Zarządzanie IoT",
+    home: LoginPage())
   );
 }

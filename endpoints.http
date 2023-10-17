@@ -1,11 +1,11 @@
 ###
 GET localhost:245 /
 
-###
+### test login
 GET localhost:245 /auth
-Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==
+Authorization: Basic {{username}} {{password}}
 
-###
+### register user
 POST localhost:245 /user/register
 Content-Type: application/json
 
@@ -14,26 +14,52 @@ Content-Type: application/json
   "password":"chuj23"
 }
 
-###
+### register device
 POST localhost:245 /device/register
 Accept: application/json
 
-###
+### list devices
 GET localhost:245 /device/list
 Accept: application/json
-Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==
+Authorization: Basic {{username}} {{password}}
 
-###
+### get device by id
 GET localhost:245 /device/1
 Accept: application/json
-Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==
+Authorization: Basic {{username}} {{password}}
 
-###
+### delete device by id (needs admin)
+DELETE localhost:245 /device/1
+Accept: application/json
+Authorization: Basic {{username}} {{password}}
+Content-Type: application/json
+
+### get device's alerts
 GET localhost:245 /device/1/alerts
 Accept: application/json
-Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==
+Authorization: Basic {{username}} {{password}}
 
-###
+### get device's data
 GET localhost:245 /device/1/data?limit=0
 Accept: application/json
-Authorization: Basic YWRtaW46S2FiYWN6ZWsxMw==
+Authorization: Basic {{username}} {{password}}
+
+### get device's config (needs admin)
+GET localhost:245 /device/1/config
+Accept: application/json
+Authorization: Basic {{username}} {{password}}
+
+### edit device's config (needs admin)
+PUT localhost:245 /device/1/config
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
+{
+  "frequency": 2,
+  "xd": "xd!"
+}
+
+### get alerts
+GET localhost:245 /alerts?limit=7
+Accept: application/json
+Authorization: Basic {{username}} {{password}}

@@ -1,12 +1,11 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/DTO/UserLoginDTO.dart';
 import 'package:mobile_app/models/User.dart';
 
 class UserService{
   UserService();
-  late User user;
+  static late User user;
   static bool loggedIn = false;
   static bool registered = false;
 
@@ -54,5 +53,4 @@ class UserService{
     ///test user
     registered = true;
   }
-
 }

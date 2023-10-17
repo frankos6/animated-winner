@@ -12,7 +12,7 @@ class DataService{
     try {
       var response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts/1'));
       if(response.statusCode == 200){
-        print(response.body);
+        //print(response.body);
 
         devices = [
           Device(id: 1, name: "dev1", location: "ogródek", isConnected: true, lastSeen: "10:08"),
@@ -29,7 +29,7 @@ class DataService{
     try {
       var response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts/1'));
       if(response.statusCode == 200){
-        print(response.body);
+        //print(response.body);
 
         /// alerts order by date time
         alerts = [
@@ -38,7 +38,7 @@ class DataService{
         ];
       }
     } catch(e) {
-      //print(e);
+      print(e);
     }
   }
 

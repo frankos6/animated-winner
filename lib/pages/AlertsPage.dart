@@ -28,7 +28,6 @@ class _AlertsPageState extends State<AlertsPage> {
     super.initState();
     if (DataService.alerts.isEmpty) {
       getAlerts();
-      print("getting alerts");
     }
   }
 
@@ -37,7 +36,7 @@ class _AlertsPageState extends State<AlertsPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Alerty"),
-        elevation: 5.0,
+        elevation: 0,
         actions: [
           IconButton(
               onPressed: () {

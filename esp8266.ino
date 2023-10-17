@@ -1,18 +1,28 @@
 #include <ESP8266WebServer.h>
 #include <ESP8266mDNS.h>
 #include <ESP8266WiFi.h>
+#include <DHT.h>
+#include <Adafruit_Sensor.h>
+
+#define DHTPIN 5
+#define DHTTYPE DHT11
 
 ESP8266WebServer server;
 int pin_led = D4;
 String ssid = "desktop1";
 String password = "12345678";
-
+DHT dht(DHTPIN,DHTTYPE);
+float t=0.0;
+float h = 0.0;
 
 
 
 void setup() {
+  
+  
   pinMode(pin_led,HIGH);
-  Serial.begin(115200);
+  Serial.begin(9600);
+
   WiFi.disconnect();
   randomSeed(analogRead(0));
   delay(10);
@@ -33,13 +43,10 @@ void setup() {
 server.on("/data", []() {
   Serial.println("Serving /data");
   server.sendHeader("Access-Control-Allow-Origin", "*");
-  int rando = random(0,100);
+  String humstring = String(h);
+  String tempstring=String(t);
   
-  
-  
-  String smt=String(rando);
-  
-  String json = "{\"Temperature\":\""  + smt + "\""+"}";
+  String json = "{\"Temperature\":\""  + tempstring + "\",\"Humidity\":\""+ h +"\"}";
   server.send(200, "application/json",json);
 });
   server.on("/toggle",toggleLED);
@@ -48,6 +55,8 @@ server.on("/data", []() {
 }
 
 void loop() { 
+  t=dht.readTemperature();
+  h=dht.readHumidity();
   server.handleClient();
   MDNS.update();
 }

@@ -145,7 +145,8 @@ const APILog = sequelize.define('APILog',{
         autoIncrement: true
     },
     endpoint: DataTypes.STRING,
-    responseStatus: DataTypes.INTEGER
+    responseStatus: DataTypes.INTEGER,
+    responseBody: DataTypes.JSON
 },{
     timestamps: true,
     updatedAt: false,
@@ -156,43 +157,10 @@ const APILog = sequelize.define('APILog',{
 
 await sequelize.sync()
 
+// log requests to database
 app.on('after',async (req,res,route)=>{
-    console.log(`endpoint ${route ? route.path : req.getPath()} - response code ${res.statusCode} ${res.body || ''}`)
-    await APILog.create({endpoint: route ? route.path : req.getPath(), responseStatus: res.statusCode})
-})
-// endpoints without auth
-app.get('/',async (req,res)=>{
-    res.send('hello world!')
-});
-
-app.post('/device/register', async (req, res)=>{
-    const devices = await Device.count()
-    const {username, password} = await sequelize.transaction(async (t) => {
-        const newUser = await User.create({username: `device${devices+1}`, password: Math.random().toString(36).substring(2,10), isDevice: true}, {transaction: t})
-        await Device.create({name: newUser.username, UserId: newUser.id}, {transaction: t})
-        return newUser
-    })
-    return res.send(201,{username, password})
-})
-
-app.post('/user/register', async (req, res)=>{
-    const {username, password} = req.body
-    if (!username || !password) {
-        throw new errors.BadRequestError('You need to provide a username and password')
-    }
-    const users = await User.findAll({
-        where: {
-            username
-        }
-    })
-    if (users.length !== 0) {
-        throw new errors.ConflictError('An user with this username already exists')
-    }
-    if (username.toLowerCase().startsWith('device')) {
-        throw new errors.ConflictError('This username is reserved for devices')
-    }
-    await User.create({username, password})
-    return res.send(201,'User created')
+    console.log(`endpoint ${req.method} ${route ? route.path : req.getPath()} - response code ${res.statusCode} ${JSON.stringify(res._body?.body || res._body || null)}`)
+    await APILog.create({endpoint: `${req.method} ${route ? route.path : req.getPath()}`, responseStatus: res.statusCode, responseBody: res._body?.body || res._body})
 })
 
 // auth handler
@@ -238,14 +206,52 @@ const isDeviceFn = async (req, res) => {
     req.device = await Device.findOne({where: {UserId: req.user.id}})
 }
 
+// endpoints without auth
+app.get('/',async (req,res)=>{
+    res.send('hello world!')
+});
+
+app.post('/device/register', async (req, res)=>{
+    const devices = await Device.count()
+    const {username, password} = await sequelize.transaction(async (t) => {
+        const newUser = await User.create({username: `device${devices+1}`, password: Math.random().toString(36).substring(2,10), isDevice: true}, {transaction: t})
+        await Device.create({name: newUser.username, UserId: newUser.id}, {transaction: t})
+        return newUser
+    })
+    return res.send(201,{username, password})
+})
+
+app.post('/user/register', async (req, res)=>{
+    const {username, password} = req.body
+    if (!username || !password) {
+        throw new errors.BadRequestError('You need to provide a username and password')
+    }
+    const users = await User.findAll({
+        where: {
+            username
+        }
+    })
+    if (users.length !== 0) {
+        throw new errors.ConflictError('An user with this username already exists')
+    }
+    if (username.toLowerCase().startsWith('device')) {
+        throw new errors.ConflictError('This username is reserved for devices')
+    }
+    await User.create({username, password})
+    return res.send(201,'User created')
+})
+
+
 // endpoints with auth
 
 app.get('/auth',[authFn, async (req, res) => {
     return res.send(`Your credentials are correct!\nYou are logged in as ${req.username}.`)
 }])
 
+// endpoints for users
+
 app.get('/device/list',[authFn, isUserFn, async (req,res) => {
-    const devices = await Device.findAll();
+    const devices = await Device.findAll({attributes: ['name', 'location', 'isConnected', 'lastSeen', 'createdAt']});
     return res.send(devices.map(d=>d.toJSON()))
 }])
 
@@ -265,16 +271,16 @@ app.del('/device/:id',[authFn, isUserFn, deviceFn, adminFn, async (req, res) => 
 }])
 
 app.get('/device/:id/alerts',[authFn, isUserFn, deviceFn,
-    async (req, res) => res.send((await Alert.findAll({where: {deviceId: req.params.id }})).map(e=>e.toJSON()))
+    async (req, res) => res.send((await Alert.findAll({where: {deviceId: req.params.id, attributes: ['payload', 'timestamp']}})).map(e=>e.toJSON()))
 ])
 
 app.get('/device/:id/data',[authFn, isUserFn, deviceFn,
-    async (req, res) => res.send((await DeviceData.findAll({where: {deviceId: req.params.id}, limit: req.query.limit || 10})).map(e=>e.toJSON()))
+    async (req, res) => res.send((await DeviceData.findAll({where: {deviceId: req.params.id}, limit: req.query.limit || 10, attributes: ['payload', 'timestamp']})).map(e=>e.toJSON()))
 ])
 
 app.get('/device/:id/config',[authFn, isUserFn, deviceFn, adminFn,
     async (req, res)=> {
-        const config = await DeviceConfiguration.findOne({where: {deviceId: req.params.id}})
+        const config = await DeviceConfiguration.findOne({where: {deviceId: req.params.id}, attributes: ['params', 'updatedAt']})
         if (!config) res.send({})
         else res.send(config.toJSON())
     }
@@ -296,7 +302,33 @@ app.put('/device/:id/config',[authFn, isUserFn, deviceFn, adminFn,
 }])
 
 app.get('/alerts', [authFn, isUserFn,
-    async (req, res)=> res.send((await Alert.findAll({limit: req.query.limit || 10})).map(e=>e.toJSON()))
+    async (req, res)=> res.send((await Alert.findAll({limit: req.query.limit || 10, order: [['timestamp', 'DESC']], attributes: ['payload', 'timestamp']})).map(e=>e.toJSON()))
+])
+
+// endpoints for devices
+
+app.post('/data', [authFn, isDeviceFn,
+    async (req, res) => {
+        await DeviceData.create({DeviceId: req.device.id, payload: req.body})
+        res.send(201)
+    }
+])
+
+app.post('/alert', [authFn, isDeviceFn,
+    async (req, res) => {
+        if (!req.is('text') && !req.is('json'))
+            throw new errors.UnsupportedMediaTypeError()
+        await Alert.create({DeviceId: req.device.id, message: req.body})
+        res.send(201)
+    }
+])
+
+app.get('/config', [authFn, isDeviceFn,
+    async (req, res) => {
+        const config = await DeviceConfiguration.findOne({where: {DeviceId: req.device.id}, attributes: ['params', 'updatedAt']})
+        if (!config) res.send(204)
+        else res.send(config.toJSON())
+    }
 ])
 
 app.listen(245,()=>console.log(`listening on port 245`))

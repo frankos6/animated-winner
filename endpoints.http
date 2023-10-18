@@ -63,3 +63,25 @@ Authorization: Basic {{username}} {{password}}
 GET localhost:245 /alerts?limit=7
 Accept: application/json
 Authorization: Basic {{username}} {{password}}
+
+### send data (as device)
+POST localhost:245 /data
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
+{
+  "temperature": 24.3,
+  "humidity": 60
+}
+
+### send alert (as device)
+POST localhost:245 /alert
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
+"essa!"
+
+### get config (as device)
+GET localhost:245 /config
+Accept: application/json
+Authorization: Basic {{username}} {{password}}

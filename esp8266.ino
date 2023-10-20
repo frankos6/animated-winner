@@ -10,7 +10,7 @@
 
 #define DHTPIN 5
 #define DHTTYPE DHT11
-
+String serverName = "Some server name";
 ESP8266WebServer server;
 WiFiClient client;
 int pin_led = D4;
@@ -67,6 +67,14 @@ server.on("/data", []() {
 }
 
 void loop() { 
+  delay(10000);
+  http.begin(client, serverName);
+  //change server name !!!
+  username = preferences.getString("username","User");
+  password = preferences.getString("password","User");
+  String postvalue = "username=" +username+"&password =" +password+"&t="+t+"&h="+h;
+  //String httpRequestData = "api_key=tPmAT5Ab3j7F9&sensor=BME280&value1=24.25&value2=49.54&value3=1005.14";
+  
   t=dht.readTemperature();
   h=dht.readHumidity();
   server.handleClient();

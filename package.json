@@ -17,5 +17,9 @@
     "restify-errors": "^8.0.2",
     "sequelize": "^6.33.0",
     "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "eslint": "^8.51.0",
+    "prettier": "^3.0.3"
   }
 }

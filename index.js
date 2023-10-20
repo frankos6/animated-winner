@@ -66,6 +66,7 @@ const Device = sequelize.define('Device',{
     name: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true
     },
     location: DataTypes.STRING,
     isConnected: {
@@ -190,6 +191,19 @@ const deviceFn = async (req, res) => {
     req.device = device
 }
 
+// user id param handler
+const userFn = async (req, res) => {
+    if (!req.params.id || req.params.id === '') throw new errors.MissingParameterError('You need to provide a user id')
+    const user = await User.findOne({where: {id: req.params.id}})
+    if (!user)
+        throw new errors.NotFoundError(`A user with id ${req.params.id} does not exist`)
+    if (user.isDevice)
+        throw new errors.BadRequestError('Device users cannot be modified')
+    if (user.id === req.user.id)
+        throw new errors.BadRequestError('You cannot modify your own account')
+    req.paramUser = user
+}
+
 // permission handler
 const adminFn = async (req, res) => {
     if (!req.user.isAdmin) throw new errors.UnauthorizedError('Only an admin can perform this action')
@@ -238,22 +252,25 @@ app.post('/user/register', async (req, res)=>{
         throw new errors.ConflictError('This username is reserved for devices')
     }
     await User.create({username, password})
-    return res.send(201,'User created')
+    return res.send(201)
 })
 
 
 // endpoints with auth
 
-app.get('/auth',[authFn, async (req, res) => {
-    return res.send(`Your credentials are correct!\nYou are logged in as ${req.username}.`)
-}])
+app.get('/auth',[authFn, async (req, res) =>
+    res.send(`Your credentials are correct!\nYou are logged in as ${req.username}.`)
+])
 
 // endpoints for users
 
-app.get('/device/list',[authFn, isUserFn, async (req,res) => {
-    const devices = await Device.findAll({attributes: ['name', 'location', 'isConnected', 'lastSeen', 'createdAt']});
-    return res.send(devices.map(d=>d.toJSON()))
-}])
+app.get('/alerts', [authFn, isUserFn,
+    async (req, res)=> res.send((await Alert.findAll({limit: req.query.limit || 10, order: [['timestamp', 'DESC']], attributes: ['payload', 'timestamp']})).map(e=>e.toJSON()))
+])
+
+app.get('/device/list',[authFn, isUserFn,
+    async (req, res) => res.send((await Device.findAll({attributes: ['name', 'location', 'isConnected', 'lastSeen', 'createdAt']})).map(e=>e.toJSON()))
+])
 
 app.get('/device/:id',[authFn, isUserFn, deviceFn,
     async (req, res) => res.send(req.device.toJSON())
@@ -267,7 +284,7 @@ app.del('/device/:id',[authFn, isUserFn, deviceFn, adminFn, async (req, res) => 
         await Device.destroy({where: {id: req.device.id}, transaction})
         await User.destroy({where: {id: req.device.UserId}, transaction})
     })
-    res.send(204)
+    res.send(200)
 }])
 
 app.get('/device/:id/alerts',[authFn, isUserFn, deviceFn,
@@ -277,6 +294,8 @@ app.get('/device/:id/alerts',[authFn, isUserFn, deviceFn,
 app.get('/device/:id/data',[authFn, isUserFn, deviceFn,
     async (req, res) => res.send((await DeviceData.findAll({where: {deviceId: req.params.id}, limit: req.query.limit || 10, attributes: ['payload', 'timestamp']})).map(e=>e.toJSON()))
 ])
+
+// endpoints for admins
 
 app.get('/device/:id/config',[authFn, isUserFn, deviceFn, adminFn,
     async (req, res)=> {
@@ -288,21 +307,66 @@ app.get('/device/:id/config',[authFn, isUserFn, deviceFn, adminFn,
 
 app.put('/device/:id/config',[authFn, isUserFn, deviceFn, adminFn,
     async (req, res)=>{
-    if (await DeviceConfiguration.findOne({where: {deviceId: req.params.id}})) {
-        await DeviceConfiguration.update({params: req.body},{
-            where: {
-                deviceId: req.params.id
-            }
-        })
-        res.send(200)
-    } else {
-        await DeviceConfiguration.create({deviceId: req.params.id, params: req.body})
-        res.send(201)
-    }
-}])
+        if (await DeviceConfiguration.findOne({where: {deviceId: req.params.id}})) {
+            await DeviceConfiguration.update({params: req.body},{
+                where: {
+                    deviceId: req.params.id
+                }
+            })
+            res.send(200)
+        } else {
+            await DeviceConfiguration.create({deviceId: req.params.id, params: req.body})
+            res.send(201)
+        }
+    }])
 
-app.get('/alerts', [authFn, isUserFn,
-    async (req, res)=> res.send((await Alert.findAll({limit: req.query.limit || 10, order: [['timestamp', 'DESC']], attributes: ['payload', 'timestamp']})).map(e=>e.toJSON()))
+app.put('/device/:id/name', [authFn, isUserFn, deviceFn, adminFn,
+    async (req, res) => {
+        if (typeof req.body !== 'string')
+            throw new errors.UnsupportedMediaTypeError("Name needs to be a string")
+        if (await Device.findOne({where: {name: req.body}}))
+            throw new errors.ConflictError('Another device already has that name')
+        await Device.update(
+            {name: req.body},
+            {where: {id: req.device.id}}
+        )
+        res.send(200)
+    }
+])
+
+app.put('/device/:id/location', [authFn, isUserFn, deviceFn, adminFn,
+    async (req, res) => {
+        if (typeof req.body !== 'string')
+            throw new errors.UnsupportedMediaTypeError("Location needs to be a string")
+        await Device.update(
+            {location: req.body},
+            {where: {id: req.device.id}}
+        )
+        res.send(200)
+    }
+])
+
+app.put('/user/:id/admin', [authFn, isUserFn, userFn, adminFn,
+    async (req, res) => {
+        if (typeof req.body !== 'boolean')
+            throw new errors.UnsupportedMediaTypeError("Admin status needs to be a boolean")
+        await User.update(
+            {isAdmin: req.body},
+            {where: {id: req.paramUser.id}}
+        )
+        res.send(200)
+    }
+])
+
+app.del('/user/:id', [authFn, isUserFn, userFn, adminFn,
+    async (req, res) => {
+        await User.destroy({where: {id: req.paramUser.id}})
+        res.send(200)
+    }
+])
+
+app.get('/user/list', [authFn, isUserFn, adminFn,
+    async (req, res) => res.send((await User.findAll({where: {isDevice: false}, attributes: ['id', 'username', 'isAdmin', 'createdAt']})).map(e=>e.toJSON()))
 ])
 
 // endpoints for devices
@@ -316,8 +380,6 @@ app.post('/data', [authFn, isDeviceFn,
 
 app.post('/alert', [authFn, isDeviceFn,
     async (req, res) => {
-        if (!req.is('text') && !req.is('json'))
-            throw new errors.UnsupportedMediaTypeError()
         await Alert.create({DeviceId: req.device.id, message: req.body})
         res.send(201)
     }

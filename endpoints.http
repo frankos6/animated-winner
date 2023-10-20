@@ -10,8 +10,7 @@ POST localhost:245 /user/register
 Content-Type: application/json
 
 {
-  "username":"device7",
-  "password":"chuj23"
+  "username":"device7"
 }
 
 ### register device
@@ -32,7 +31,6 @@ Authorization: Basic {{username}} {{password}}
 DELETE localhost:245 /device/1
 Accept: application/json
 Authorization: Basic {{username}} {{password}}
-Content-Type: application/json
 
 ### get device's alerts
 GET localhost:245 /device/1/alerts
@@ -83,5 +81,35 @@ Authorization: Basic {{username}} {{password}}
 
 ### get config (as device)
 GET localhost:245 /config
+Accept: application/json
+Authorization: Basic {{username}} {{password}}
+
+### change device name (needs admin)
+PUT localhost:245 /device/1/name
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
+17
+
+### change device location (needs admin)
+PUT localhost:245 /device/1/location
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
+"Zespół Szkół \"Elektryk\" im. Noblistów Polskich w Słupsku"
+
+### change user admin status (needs admin)
+PUT localhost:245 /user/2/admin
+Content-Type: application/json
+Authorization: Basic {{username}} {{password}}
+
+true
+
+### delete user (needs admin)
+DELETE localhost:245 /user/2
+Authorization: Basic {{username}} {{password}}
+
+### list users (needs admin)
+GET localhost:245 /user/list
 Accept: application/json
 Authorization: Basic {{username}} {{password}}

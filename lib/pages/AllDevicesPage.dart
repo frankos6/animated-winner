@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_app/pages/DevicePage.dart';
 import '../models/Device.dart';
 import '../services/DataService.dart';
 import '../services/Themes.dart';
@@ -59,7 +60,9 @@ class _AllDevicesPageState extends State<AllDevicesPage> {
             itemBuilder: (context, index) {
               return GestureDetector(
                 onTap: () {
-                  print("opening device page");
+                  if(context.mounted){
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => DevicePage(deviceId: index)));
+                  }
                 },
                 child: Card(
                   shape: const RoundedRectangleBorder(
@@ -68,8 +71,34 @@ class _AllDevicesPageState extends State<AllDevicesPage> {
                   color: Colors.white,
                   child: Container(
                       padding: const EdgeInsets.all(20),
-                      child: Text("device")
-                  ),
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text(DataService.devices[index].name,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16))
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                  DataService.devices[index].isConnected
+                                      ? "Połączony"
+                                      : "Niepołączony",
+                                  style: TextStyle(
+                                      color:
+                                          DataService.devices[index].isConnected
+                                              ? Colors.green[600]
+                                              : Colors.redAccent)),
+                              Text(
+                                  "Ostatnio widziano: ${DataService.devices[index].lastSeen}")
+                            ],
+                          )
+                        ],
+                      )),
                 ),
               );
             }),

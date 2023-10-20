@@ -27,6 +27,10 @@ class _MainPageState extends State<MainPage> {
           AlertsPage(),
         ],
       ),
+      bottomNavigationBar: Container(
+        height: 60,
+        color: Colors.blue,
+      ),
     );
   }
 }

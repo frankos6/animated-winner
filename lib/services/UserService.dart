@@ -29,7 +29,15 @@ class UserService{
     ///test user
     if(userData.password == "admin" && userData.login == "admin"){
       loggedIn = true;
-      user = User(userId: 1, login: "admin", password: "admin", role: 1);
+      user = User(userId: 1, login: "admin", password: "admin", isAdmin: true);
+      return;
+    }else{
+      loggedIn = false;
+    }
+    if(userData.password == "user" && userData.login == "user"){
+      loggedIn = true;
+      user = User(userId: 2, login: "user", password: "user", isAdmin: false);
+      return;
     }else{
       loggedIn = false;
     }

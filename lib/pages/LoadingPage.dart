@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_app/models/Device.dart';
 import 'package:mobile_app/services/DataService.dart';
 
 import '../services/Themes.dart';

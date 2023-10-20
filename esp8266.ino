@@ -3,6 +3,8 @@
 #include <ESP8266WiFi.h>
 #include <DHT.h>
 #include <Adafruit_Sensor.h>
+#include <FS.h>
+#include <Preferences.h>
 
 #define DHTPIN 5
 #define DHTTYPE DHT11
@@ -15,7 +17,7 @@ DHT dht(DHTPIN,DHTTYPE);
 float t=0.0;
 float h = 0.0;
 
-
+Preferences preferences;
 
 void setup() {
   
@@ -43,13 +45,17 @@ void setup() {
 server.on("/data", []() {
   Serial.println("Serving /data");
   server.sendHeader("Access-Control-Allow-Origin", "*");
+  String username = preferences.getString("username","User");
+  String password = preferences.getString("password","User");
   String humstring = String(h);
   String tempstring=String(t);
   
-  String json = "{\"Temperature\":\""  + tempstring + "\",\"Humidity\":\""+ h +"\"}";
+  String json = "{\"Temperature\":\""  + tempstring + "\",\"Humidity\":\""+ h +"\", \" Username\":\""+username+"\",\"Password\":\""+password+"\"}";
   server.send(200, "application/json",json);
 });
   server.on("/toggle",toggleLED);
+  preferences.begin("esp82");
+  
   server.begin();
   Serial.println("HTTP server started");
 }
@@ -60,8 +66,11 @@ void loop() {
   server.handleClient();
   MDNS.update();
 }
+
 void toggleLED()
 {
   digitalWrite(pin_led,!digitalRead(pin_led));
+  preferences.putString("username","User1");
+  preferences.putString("password","User2");
   server.send(204,"");
 }

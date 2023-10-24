@@ -73,8 +73,8 @@ void loop() {
   username = preferences.getString("username","User");
   password = preferences.getString("password","User");
   String postvalue = "username=" +username+"&password =" +password+"&t="+t+"&h="+h;
-  //String httpRequestData = "api_key=tPmAT5Ab3j7F9&sensor=BME280&value1=24.25&value2=49.54&value3=1005.14";
-  
+  http.addHeader("Content-Type", "application/json");
+  int httpResponseCode = http.POST("{\"Temperature\":\""  + tempstring + "\",\"Humidity\":\""+ h +"\", \"Username\":\""+username+"\",\"Password\":\""+password+"\"}");
   t=dht.readTemperature();
   h=dht.readHumidity();
   server.handleClient();

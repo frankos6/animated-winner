@@ -1,4 +1,6 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:mobile_app/models/Temperature.dart';
 import 'package:mobile_app/pages/ConfigPage.dart';
 import 'package:mobile_app/services/DataService.dart';
 import 'package:mobile_app/services/DeviceService.dart';
@@ -14,29 +16,36 @@ class DevicePage extends StatefulWidget {
 }
 
 class _DevicePageState extends State<DevicePage> {
- late DeviceService deviceService;
- getData() async {
-   await deviceService.getConfig();
-   await deviceService.getAlerts();
-   setState(() {
+  late DeviceService deviceService;
+  TooltipBehavior tooltipBehavior = TooltipBehavior(enable: true);
 
-   });
- }
-
- @override
-  void initState() {
-   deviceService = DeviceService(deviceId: widget.deviceId);
-   getData();
-   super.initState();
+  getData() async {
+    await deviceService.getConfig();
+    await deviceService.getAlerts();
+    await deviceService.getData();
+    setState(() {});
   }
 
- @override
+  @override
+  void initState() {
+    deviceService = DeviceService(deviceId: widget.deviceId);
+    getData();
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
           title: Text(DataService.devices[widget.deviceId].name),
           elevation: 2,
           actions: [
+            IconButton(
+                onPressed: () {
+                  getData();
+                },
+                icon: const Icon(Icons.refresh)
+            ),
             if (UserService.user.isAdmin &&
                 DataService.devices[widget.deviceId].isConnected)
               IconButton(
@@ -75,11 +84,16 @@ class _DevicePageState extends State<DevicePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Nazwa: ${DataService.devices[widget.deviceId].name}", style: const TextStyle(fontSize: 16)),
-                            Text("Ostatnio widziano: ${DataService.devices[widget.deviceId].lastSeen}", style: const TextStyle(fontSize: 16)),
-                            if(deviceService.gotConfig)
-                            Text("Częstotliwość wysyłania danych: ${deviceService.config.dsf}", style: const TextStyle(fontSize: 16)),
-
+                            Text(
+                                "Nazwa: ${DataService.devices[widget.deviceId].name}",
+                                style: const TextStyle(fontSize: 16)),
+                            Text(
+                                "Ostatnio widziano: ${DataService.devices[widget.deviceId].lastSeen}",
+                                style: const TextStyle(fontSize: 16)),
+                            if (deviceService.gotConfig)
+                              Text(
+                                  "Częstotliwość wysyłania danych: ${deviceService.config.dsf}",
+                                  style: const TextStyle(fontSize: 16)),
                           ],
                         ),
                       ),
@@ -87,12 +101,22 @@ class _DevicePageState extends State<DevicePage> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Lokalizacja: ${DataService.devices[widget.deviceId].location}", style: const TextStyle(fontSize: 16)),
-                            Text(DataService.devices[widget.deviceId].isConnected ? "Połączony": "Niepołączony", style: const TextStyle(fontSize: 16)),
-                            if(deviceService.gotConfig)
-                              Text("Max. temperatura: ${deviceService.config.maxTemp}°C", style: const TextStyle(fontSize: 16)),
-                            if(deviceService.gotConfig)
-                              Text("Max. wilgotność: ${deviceService.config.maxHum}%", style: const TextStyle(fontSize: 16)),
+                            Text(
+                                "Lokalizacja: ${DataService.devices[widget.deviceId].location}",
+                                style: const TextStyle(fontSize: 16)),
+                            Text(
+                                DataService.devices[widget.deviceId].isConnected
+                                    ? "Połączony"
+                                    : "Niepołączony",
+                                style: const TextStyle(fontSize: 16)),
+                            if (deviceService.gotConfig)
+                              Text(
+                                  "Max. temperatura: ${deviceService.config.maxTemp}°C",
+                                  style: const TextStyle(fontSize: 16)),
+                            if (deviceService.gotConfig)
+                              Text(
+                                  "Max. wilgotność: ${deviceService.config.maxHum}%",
+                                  style: const TextStyle(fontSize: 16)),
                           ],
                         ),
                       )
@@ -114,32 +138,67 @@ class _DevicePageState extends State<DevicePage> {
                       itemBuilder: (context, index) {
                         return Card(
                           shape: const RoundedRectangleBorder(
-                              borderRadius: BorderRadius.all(Radius.circular(15))),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(15))),
                           margin: const EdgeInsets.all(10),
                           color: Colors.white,
                           child: Container(
                               padding: const EdgeInsets.all(20),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  Text("${deviceService.alerts[index].timestamp}: ",
+                                  const Icon(Icons.warning, color: Colors.red),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                      "${deviceService.alerts[index].timestamp}: ",
                                       style: const TextStyle(fontSize: 16)),
                                   Expanded(
-                                    child: Text("${deviceService.alerts[index].payload}",
-                                        style: const TextStyle(
-                                            fontSize: 16)),
+                                    child: Text(
+                                        "${deviceService.alerts[index].payload}",
+                                        style: const TextStyle(fontSize: 16)),
                                   )
                                 ],
                               )),
                         );
                       }),
                 ),
+
                 ///https://pub.dev/packages/syncfusion_flutter_charts
                 SfCartesianChart(
+                  title: ChartTitle(text: "Temperatura"),
+                  tooltipBehavior: tooltipBehavior,
+                  primaryXAxis: CategoryAxis(
+                    majorGridLines: MajorGridLines(width: 0),
+                  ),
+                  series: getTemperatureData(),
                 )
               ],
             )
           ],
         ));
   }
+  List<LineSeries<Temperature, String>> getTemperatureData() {
+    List<Temperature> temperatureDataList =
+    List<Temperature>.empty(growable: true);
+
+    temperatureDataList = deviceService.temperature;
+
+    return [
+      LineSeries<Temperature, String>(
+          name: "Temperatura",
+          dataSource: temperatureDataList,
+          xValueMapper: (Temperature temp, _) =>
+          (temp.time.hour < 10 ? "0${temp.time.hour}" : "${temp.time.hour}") +
+              (temp.time.minute < 10
+                  ? ":0${temp.time.minute}"
+                  : ":${temp.time.minute}") +
+              (temp.time.second < 10
+                  ? ":0${temp.time.second}"
+                  : ":${temp.time.second}"),
+          yValueMapper: (Temperature temp, _) => temp.temperature)
+    ];
+  }
 }
+
+

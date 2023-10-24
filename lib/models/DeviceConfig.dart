@@ -10,5 +10,4 @@ class DeviceConfig{
   required this.maxTemp,
   required this.maxHum
 });
-
 }

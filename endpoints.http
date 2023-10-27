@@ -54,7 +54,10 @@ Authorization: Basic {{username}} {{password}}
 
 {
   "frequency": 2,
-  "xd": "xd!"
+  "maxTemp": 27,
+  "minTemp": 15,
+  "maxHumidity": 95,
+  "minHumidity": 10
 }
 
 ### get alerts

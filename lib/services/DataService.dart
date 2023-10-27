@@ -1,12 +1,14 @@
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/Alert.dart';
 import 'package:mobile_app/models/Device.dart';
+import '../models/User.dart';
 
 class DataService{
   DataService();
 
   static List<Device> devices = List<Device>.empty(growable: true);
   static List<Alert> alerts = List<Alert>.empty(growable: true);
+  static List<User> users = List<User>.empty(growable: true);
 
   Future<void> getDevices() async {
     try {
@@ -42,6 +44,21 @@ class DataService{
     }
   }
 
+  Future<void> getUsers() async {
+    try {
+      var response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts/1'));
+      if(response.statusCode == 200){
+        print(response.body);
 
+        users = [
+          User(userId: 1, login: "admin", password: "admin", isAdmin: true),
+          User(userId: 2, login: "user", password: "user", isAdmin: false),
+          User(userId: 3, login: "qwerty", password: "qwerty", isAdmin: false)
+        ];
+      }
+    } catch(e) {
+      print(e);
+    }
+  }
 
 }

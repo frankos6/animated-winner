@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/DTO/UserLoginDTO.dart';
 import 'package:mobile_app/models/User.dart';
+import 'package:mobile_app/services/DataService.dart';
 
 class UserService{
   UserService();
@@ -61,4 +62,29 @@ class UserService{
     ///test user
     registered = true;
   }
+
+  void logOut() {
+    loggedIn = false;
+    registered = false;
+    user = User(userId: 0, login: "", password: "", isAdmin: false);
+  }
+
+  Future<void> changeUserRole(int userId, bool admin) async {
+    ///call to api to register endpoint
+    try {
+      var response = await http.post(
+          Uri.parse('https://jsonplaceholder.typicode.com/posts/'),
+
+      );
+      if(response.statusCode == 200 || response.statusCode == 201){
+        print(response.body);
+
+      }
+    } catch(e) {
+      print(e);
+    }
+
+
+  }
+
 }

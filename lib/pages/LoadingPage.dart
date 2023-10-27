@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/services/DataService.dart';
 
 import '../services/Themes.dart';
+import '../services/UserService.dart';
 import 'MainPage.dart';
 
 class Loading extends StatefulWidget {
@@ -17,6 +18,10 @@ class _LoadingState extends State<Loading> {
 
     await dataService.getDevices();
     await dataService.getAlerts();
+
+    if(UserService.user.isAdmin){
+      await dataService.getUsers();
+    }
 
     if (context.mounted) {
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));

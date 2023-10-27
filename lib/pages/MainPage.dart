@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_app/pages/AlertsPage.dart';
 import 'package:mobile_app/pages/AllDevicesPage.dart';
+import 'package:mobile_app/pages/UserPage.dart';
 import '../models/Device.dart';
 
 class MainPage extends StatefulWidget {
@@ -25,6 +26,7 @@ class _MainPageState extends State<MainPage> {
         children: const [
           AllDevicesPage(),
           AlertsPage(),
+          UserPage()
         ],
       ),
       bottomNavigationBar: Container(

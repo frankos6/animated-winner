@@ -24,7 +24,9 @@ class _DevicePageState extends State<DevicePage> {
     await deviceService.getConfig();
     await deviceService.getAlerts();
     await deviceService.getData();
-    setState(() {});
+    if(context.mounted){
+      setState(() {});
+    }
   }
 
   @override

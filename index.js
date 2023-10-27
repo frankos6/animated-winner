@@ -196,6 +196,15 @@ app.on('UnauthorizedError', async (req, res) => {
 	res.set('WWW-Authenticate', 'Basic');
 });
 
+// set lastSeen and isConnected on devices
+app.on('after', async (req, res) => {
+	if (req.device) {
+		req.device.lastSeen = new Date(Date.now());
+		await req.device.save();
+		// TODO: handle isConnected variable
+	}
+});
+
 // auth handler
 const authFn = async (req) => {
 	if (!req.username)
@@ -225,7 +234,7 @@ const deviceFn = async (req) => {
 		throw new errors.NotFoundError(
 			`A device with id ${req.params.id} does not exist`,
 		);
-	req.device = device;
+	req.paramDevice = device;
 };
 
 // user id param handler
@@ -368,7 +377,7 @@ app.get('/device/:id', [
 	authFn,
 	isUserFn,
 	deviceFn,
-	async (req, res) => res.send(req.device.toJSON()),
+	async (req, res) => res.send(req.paramDevice.toJSON()),
 ]);
 
 app.del('/device/:id', [
@@ -379,7 +388,7 @@ app.del('/device/:id', [
 	async (req, res) => {
 		await sequelize.transaction(async (transaction) => {
 			await DeviceConfiguration.destroy({
-				where: { deviceId: req.device.id },
+				where: { deviceId: req.paramDevice.id },
 				transaction,
 			});
 			await Alert.destroy({
@@ -509,7 +518,7 @@ app.put('/device/:id/name', [
 			);
 		await Device.update(
 			{ name: req.body },
-			{ where: { id: req.device.id } },
+			{ where: { id: req.paramDevice.id } },
 		);
 		res.send(200);
 	},
@@ -527,7 +536,7 @@ app.put('/device/:id/location', [
 			);
 		await Device.update(
 			{ location: req.body },
-			{ where: { id: req.device.id } },
+			{ where: { id: req.paramDevice.id } },
 		);
 		res.send(200);
 	},

@@ -64,12 +64,20 @@ class DeviceService{
       if(response.statusCode == 200){
         //print(response.body);
         temperature = List<Temperature>.empty(growable: true);
+        humidity = List<Humidity>.empty(growable: true);
 
         for (int i = 1; i < 7; i++) {
           temperature.add(Temperature(
               temperature: Random().nextInt(2) + 20,
               time: DateTime(2023, 10, 24, 9, i)));
         }
+
+        for (int i = 1; i < 7; i++) {
+          humidity.add(
+            Humidity(humidity: Random().nextInt(20)+80, time: DateTime(2023, 10, 24, 9, i)),
+          );
+        }
+
       }
     } catch(e) {
       print(e);

@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:mobile_app/models/Humidity.dart';
 import 'package:mobile_app/models/Temperature.dart';
 import 'package:mobile_app/pages/ConfigPage.dart';
 import 'package:mobile_app/services/DataService.dart';
@@ -169,9 +170,17 @@ class _DevicePageState extends State<DevicePage> {
                   title: ChartTitle(text: "Temperatura"),
                   tooltipBehavior: tooltipBehavior,
                   primaryXAxis: CategoryAxis(
-                    majorGridLines: MajorGridLines(width: 0),
+                    majorGridLines: const MajorGridLines(width: 0),
                   ),
                   series: getTemperatureData(),
+                ),
+                SfCartesianChart(
+                  title: ChartTitle(text: "Wilgotność"),
+                  tooltipBehavior: tooltipBehavior,
+                  primaryXAxis: CategoryAxis(
+                    majorGridLines: const MajorGridLines(width: 0),
+                  ),
+                  series: getHumidityData(),
                 )
               ],
             )
@@ -186,7 +195,7 @@ class _DevicePageState extends State<DevicePage> {
 
     return [
       LineSeries<Temperature, String>(
-          name: "Temperatura",
+          name: "Wilgotność",
           dataSource: temperatureDataList,
           xValueMapper: (Temperature temp, _) =>
           (temp.time.hour < 10 ? "0${temp.time.hour}" : "${temp.time.hour}") +
@@ -197,6 +206,28 @@ class _DevicePageState extends State<DevicePage> {
                   ? ":0${temp.time.second}"
                   : ":${temp.time.second}"),
           yValueMapper: (Temperature temp, _) => temp.temperature)
+    ];
+  }
+
+  List<LineSeries<Humidity, String>> getHumidityData() {
+    List<Humidity> humidityDataList =
+    List<Humidity>.empty(growable: true);
+
+    humidityDataList = deviceService.humidity;
+
+    return [
+      LineSeries<Humidity, String>(
+          name: "Temperatura",
+          dataSource: humidityDataList,
+          xValueMapper: (Humidity hum, _) =>
+          (hum.time.hour < 10 ? "0${hum.time.hour}" : "${hum.time.hour}") +
+              (hum.time.minute < 10
+                  ? ":0${hum.time.minute}"
+                  : ":${hum.time.minute}") +
+              (hum.time.second < 10
+                  ? ":0${hum.time.second}"
+                  : ":${hum.time.second}"),
+          yValueMapper: (Humidity hum, _) => hum.humidity)
     ];
   }
 }

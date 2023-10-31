@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:mobile_app/services/DataService.dart';
 
 import '../models/Alert.dart';
+import '../models/Device.dart';
 import '../services/Themes.dart';
+import 'DevicePage.dart';
 
 class AlertsPage extends StatefulWidget {
   const AlertsPage({super.key});
@@ -58,45 +60,55 @@ class _AlertsPageState extends State<AlertsPage> {
             controller: scrollController,
             itemCount: alerts.length,
             itemBuilder: (context, index) {
-              return Card(
-                shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(15))),
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                color: Colors.white,
-                child: Container(
-                    padding: const EdgeInsets.all(20),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            children: [
-                              Text(
-                                DataService.devices
-                                    .firstWhere((element) =>
-                                        element.id == alerts[index].deviceId)
-                                    .name,
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold),
-                                overflow: TextOverflow.ellipsis,
-                                softWrap: true,
-                              ),
-                              Text("Id: ${alerts[index].deviceId}",
-                                  style: const TextStyle(fontSize: 16))
-                            ],
+              return GestureDetector(
+                onTap: () {
+                  if(context.mounted){
+                    Device dev = DataService.devices.firstWhere((element) => element.id == alerts[index].deviceId);
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => DevicePage(device: dev)));
+                  }
+                },
+                child: Card(
+                  shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                  margin: const EdgeInsets.symmetric(vertical: 10),
+                  color: Colors.white,
+                  child: Container(
+                      padding: const EdgeInsets.all(20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          const SizedBox(
+                              width: 40,
+                              child: Icon(Icons.warning,
+                                  color: Colors.redAccent, size: 30)),
+                          Expanded(
+                            child: Column(
+                              children: [
+                                Text(
+                                  DataService.devices.firstWhere((element) => element.id == alerts[index].deviceId)
+                                      .name,
+                                  style: const TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold),
+                                  overflow: TextOverflow.ellipsis,
+                                  softWrap: true,
+                                ),
+                                Text("Id: ${alerts[index].deviceId}",
+                                    style: const TextStyle(fontSize: 16))
+                              ],
+                            ),
                           ),
-                        ),
-                        Expanded(
-                          child: Column(children: [
-                            Text("${alerts[index].payload}",
-                                style: const TextStyle(
-                                    fontSize: 18, fontWeight: FontWeight.bold)),
-                            Text("${alerts[index].timestamp}",
-                                style: const TextStyle(fontSize: 16))
-                          ]),
-                        )
-                      ],
-                    )),
+                          Expanded(
+                            child: Column(children: [
+                              Text("${alerts[index].payload}",
+                                  style: const TextStyle(
+                                      fontSize: 18, fontWeight: FontWeight.bold)),
+                              Text("${alerts[index].timestamp}",
+                                  style: const TextStyle(fontSize: 16))
+                            ]),
+                          )
+                        ],
+                      )),
+                ),
               );
             }),
       ),

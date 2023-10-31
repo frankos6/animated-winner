@@ -61,7 +61,7 @@ class _AllDevicesPageState extends State<AllDevicesPage> {
               return GestureDetector(
                 onTap: () {
                   if(context.mounted){
-                    Navigator.push(context, MaterialPageRoute(builder: (context) => DevicePage(deviceId: index)));
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => DevicePage(device: DataService.devices[index])));
                   }
                 },
                 child: Card(

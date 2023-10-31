@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mobile_app/services/DataService.dart';
 
 import '../services/Themes.dart';
@@ -24,7 +25,7 @@ class _LoadingState extends State<Loading> {
     }
 
     if (context.mounted) {
-      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => MainPage()));
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const MainPage()));
     }
   }
 
@@ -46,6 +47,16 @@ class _LoadingState extends State<Loading> {
                 colors: [Themes.darkBlue, Themes.lightBlue],
                 begin: Alignment.bottomRight,
                 end: Alignment.topLeft)),
+      child: Center(child: Container(
+        width: 70,
+        height: 70,
+        decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.all(Radius.circular(10))),
+        child: SpinKitRing(
+          color: Colors.blue,
+        ),
+      ),),
       ),
     );
   }

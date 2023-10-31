@@ -4,7 +4,6 @@ import 'package:mobile_app/models/DTO/UserLoginDTO.dart';
 import 'package:mobile_app/pages/LoadingPage.dart';
 import 'package:mobile_app/services/Themes.dart';
 import 'package:mobile_app/services/UserService.dart';
-import 'MainPage.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -35,7 +34,7 @@ class _LoginPageState extends State<LoginPage> {
         child: Align(
           alignment: Alignment.center,
           child: Container(
-            height: 330,
+            height: 355,
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
                 color: Colors.white,
@@ -43,6 +42,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                const Center(child: Text("System zarządzania urządzeniami IoT", style: TextStyle(fontWeight: FontWeight.bold))),
+                const SizedBox(height: 20),
                 const Text("Login:"),
                 TextFormField(
                   controller: _loginController,
@@ -55,6 +56,7 @@ class _LoginPageState extends State<LoginPage> {
                   autocorrect: false,
                   enableSuggestions: false,
                 ),
+                const SizedBox(height: 10),
                 Visibility(
                   visible: buttonsEnabled,
                   child: ElevatedButton(

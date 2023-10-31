@@ -3,14 +3,15 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mobile_app/models/Humidity.dart';
 import 'package:mobile_app/models/Temperature.dart';
 import 'package:mobile_app/pages/ConfigPage.dart';
-import 'package:mobile_app/services/DataService.dart';
 import 'package:mobile_app/services/DeviceService.dart';
 import 'package:mobile_app/services/UserService.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+import '../models/Device.dart';
+
 class DevicePage extends StatefulWidget {
-  final int deviceId;
-  const DevicePage({super.key, required this.deviceId});
+  final Device device;
+  const DevicePage({super.key, required this.device});
 
   @override
   State<DevicePage> createState() => _DevicePageState();
@@ -22,6 +23,7 @@ class _DevicePageState extends State<DevicePage> {
   bool gotData = false;
 
   getData() async {
+
     await deviceService.getConfig();
     await deviceService.getAlerts();
     await deviceService.getData();
@@ -34,9 +36,10 @@ class _DevicePageState extends State<DevicePage> {
 
   @override
   void initState() {
-    deviceService = DeviceService(deviceId: widget.deviceId);
-    getData();
     super.initState();
+    gotData = false;
+    deviceService = DeviceService(device: widget.device);
+    getData();
   }
 
   @override
@@ -44,7 +47,7 @@ class _DevicePageState extends State<DevicePage> {
     if (gotData) {
       return Scaffold(
           appBar: AppBar(
-            title: Text(DataService.devices[widget.deviceId].name),
+            title: Text(deviceService.device.name),
             elevation: 2,
             actions: [
               IconButton(
@@ -53,7 +56,7 @@ class _DevicePageState extends State<DevicePage> {
                   },
                   icon: const Icon(Icons.refresh)),
               if (UserService.user.isAdmin &&
-                  DataService.devices[widget.deviceId].isConnected)
+                  widget.device.isConnected)
                 IconButton(
                     onPressed: () {
                       if (context.mounted) {
@@ -93,10 +96,10 @@ class _DevicePageState extends State<DevicePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                  "Nazwa: ${DataService.devices[widget.deviceId].name}",
+                                  "Nazwa: ${widget.device.name}",
                                   style: const TextStyle(fontSize: 16)),
                               Text(
-                                  "Ostatnio widziano: ${DataService.devices[widget.deviceId].lastSeen}",
+                                  "Ostatnio widziano: ${widget.device.lastSeen}",
                                   style: const TextStyle(fontSize: 16)),
                               if (deviceService.gotConfig)
                                 Text(
@@ -110,11 +113,10 @@ class _DevicePageState extends State<DevicePage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                  "Lokalizacja: ${DataService.devices[widget.deviceId].location}",
+                                  "Lokalizacja: ${widget.device.location}",
                                   style: const TextStyle(fontSize: 16)),
                               Text(
-                                  DataService
-                                          .devices[widget.deviceId].isConnected
+                                  widget.device.isConnected
                                       ? "Połączony"
                                       : "Niepołączony",
                                   style: const TextStyle(fontSize: 16)),
@@ -158,7 +160,7 @@ class _DevicePageState extends State<DevicePage> {
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
                                     const Icon(Icons.warning,
-                                        color: Colors.red),
+                                        color: Colors.redAccent),
                                     const SizedBox(width: 10),
                                     Text(
                                         "${deviceService.alerts[index].timestamp}: ",
@@ -196,7 +198,7 @@ class _DevicePageState extends State<DevicePage> {
     } else {
       return Scaffold(
         appBar: AppBar(
-          title: Text(DataService.devices[widget.deviceId].name),
+          title: Text(widget.device.name),
           elevation: 2,
         ),
         body: const Center(

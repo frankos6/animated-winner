@@ -1,20 +1,22 @@
 import 'dart:math';
-
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/Alert.dart';
 import 'package:mobile_app/models/DeviceConfig.dart';
 import 'package:mobile_app/models/Humidity.dart';
 import 'package:mobile_app/models/Temperature.dart';
+import '../models/Device.dart';
+import 'DataService.dart';
 
 class DeviceService{
-  late int deviceId;
-  List<Alert> alerts = List<Alert>.empty(growable: true);
+  late Device device;
   late DeviceConfig config;
-  bool gotConfig = false;
+  List<Alert> alerts = List<Alert>.empty(growable: true);
   List<Temperature> temperature = List<Temperature>.empty(growable: true);
   List<Humidity> humidity = List<Humidity>.empty(growable: true);
+  bool gotConfig = false;
 
-  DeviceService({required this.deviceId});
+  DeviceService({required this.device});
+
 
   Future<void> getConfig() async {
     try {
@@ -22,7 +24,7 @@ class DeviceService{
       if(response.statusCode == 200){
         //print(response.body);
 
-        config = DeviceConfig(deviceId: deviceId, dsf: 9600, maxTemp: 30, maxHum: 80);
+        config = DeviceConfig(deviceId: device.id, dsf: 9600, maxTemp: 30, maxHum: 80);
         gotConfig = true;
       }
     } catch(e) {
@@ -49,8 +51,8 @@ class DeviceService{
 
         /// alerts order by date time
         alerts = [
-          Alert(alertId: 3, deviceId: deviceId, timestamp: "12:33", payload: "wet"),
-          Alert(alertId: 4, deviceId: deviceId, timestamp: "12:37", payload: "Overheat"),
+          Alert(alertId: 3, deviceId: device.id, timestamp: "12:33", payload: "wet"),
+          Alert(alertId: 4, deviceId: device.id, timestamp: "12:37", payload: "Overheat"),
         ];
       }
     } catch(e) {

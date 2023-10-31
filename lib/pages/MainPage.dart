@@ -1,8 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:mobile_app/pages/AlertsPage.dart';
 import 'package:mobile_app/pages/AllDevicesPage.dart';
 import 'package:mobile_app/pages/UserPage.dart';
-import '../models/Device.dart';
 
 class MainPage extends StatefulWidget {
   const MainPage({super.key});
@@ -13,16 +13,16 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
 
-  PageController pageController = PageController(
-      initialPage: 0,
-      keepPage: true
-  );
+  int currentPage = 0;
 
   @override
   Widget build(BuildContext context) {
+    final PageController pageController = PageController(initialPage: currentPage);
+
     return Scaffold(
       body: PageView(
         controller: pageController,
+        pageSnapping: true,
         children: const [
           AllDevicesPage(),
           AlertsPage(),
@@ -40,12 +40,15 @@ class _MainPageState extends State<MainPage> {
                 elevation: MaterialStatePropertyAll(0)
               ),
               onPressed: (){
-                pageController.animateToPage(0, duration: Duration(microseconds: 500), curve: Curves.linear);
-              }, child: const Column(
+                pageController.animateToPage(0, duration: const Duration(milliseconds: 500), curve: Curves.ease);
+                setState(() {
+                  currentPage = 0;
+                });
+              }, child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.devices),
-                  Text("Urządzenia")
+                  Icon(currentPage == 0 ? Icons.view_module : Icons.view_module_outlined),
+                  const Text("Urządzenia")
                 ],
               ),
             ),
@@ -54,12 +57,15 @@ class _MainPageState extends State<MainPage> {
                   elevation: MaterialStatePropertyAll(0)
               ),
               onPressed: (){
-                pageController.animateToPage(1, duration: Duration(microseconds: 500), curve: Curves.linear);
-              }, child: const Column(
+                pageController.animateToPage(1, duration: const Duration(milliseconds: 500), curve: Curves.ease);
+                setState(() {
+                  currentPage = 1;
+                });
+              }, child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.announcement),
-                Text("Alerty")
+                Icon(currentPage == 1 ? Icons.announcement : Icons.announcement_outlined),
+                const Text("Alerty")
               ],
             ),
             ),
@@ -68,12 +74,15 @@ class _MainPageState extends State<MainPage> {
                   elevation: MaterialStatePropertyAll(0)
               ),
               onPressed: (){
-                pageController.animateToPage(2, duration: Duration(microseconds: 500), curve: Curves.linear);
-              }, child: const Column(
+                pageController.animateToPage(2, duration: const Duration(milliseconds: 500), curve: Curves.ease);
+                setState(() {
+                  currentPage = 2;
+                });
+              }, child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.person),
-                Text("Użytkownik")
+                Icon(currentPage == 2 ? Icons.person : Icons.person_outline),
+                const Text("Użytkownik")
               ],
             ),
             )

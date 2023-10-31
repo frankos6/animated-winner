@@ -197,11 +197,29 @@ app.on('UnauthorizedError', async (req, res) => {
 });
 
 // set lastSeen and isConnected on devices
+let timeouts = [];
 app.on('after', async (req, res) => {
 	if (req.device) {
 		req.device.lastSeen = new Date(Date.now());
+		req.device.isConnected = true;
 		await req.device.save();
-		// TODO: handle isConnected variable
+		let devices = timeouts.filter((obj) => obj.device.id === req.device.id);
+		if (devices.length !== 0) {
+			for (let timeout of devices) {
+				clearTimeout(timeout.timeoutId);
+			}
+		}
+		let timeoutId = setTimeout(async () => {
+			req.device.isConnected = false;
+			await req.device.save();
+			const index = timeouts.indexOf({
+				device: req.device,
+				timeoutId,
+			});
+			timeouts.splice(index, 1);
+			console.log(`set device ${req.device.id} isConnected to false`);
+		}, 30000);
+		timeouts.push({ device: req.device, timeoutId });
 	}
 });
 

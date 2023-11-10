@@ -17,7 +17,7 @@ class _AllDevicesPageState extends State<AllDevicesPage> {
 
   getDevices() async {
     DataService dataService = DataService();
-    await dataService.getAlerts();
+    await dataService.getDevices();
     setState(() {
       devices = DataService.devices;
     });

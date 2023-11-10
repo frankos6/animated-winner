@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/Alert.dart';
@@ -5,6 +6,8 @@ import 'package:mobile_app/models/DeviceConfig.dart';
 import 'package:mobile_app/models/Humidity.dart';
 import 'package:mobile_app/models/Temperature.dart';
 import '../models/Device.dart';
+import 'Config.dart';
+import 'UserService.dart';
 
 class DeviceService{
   late Device device;
@@ -17,13 +20,20 @@ class DeviceService{
   DeviceService({required this.device});
 
 
-  Future<void> getConfig() async {
+  Future<void> getConfig(int deviceId) async {
     try {
-      var response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts/1'));
+      print(deviceId);
+      var response = await http.get(
+          Uri.parse('${Config.ip}/device/$deviceId/config'),
+          headers: {
+            "Accept": "application/json",
+            "Authorization": UserService.loginData
+          }
+      );
+      
       if(response.statusCode == 200){
-        //print(response.body);
-
-        config = DeviceConfig(deviceId: device.id, dsf: 9600, maxTemp: 30, maxHum: 80);
+        
+        config = DeviceConfig.fromJson(jsonDecode(response.body));
         gotConfig = true;
       }
     } catch(e) {

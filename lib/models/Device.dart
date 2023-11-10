@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class Device{
   late int id;
   late String name;
@@ -26,8 +28,14 @@ class Device{
   Device.fromJson(Map<String, dynamic> json){
     id = json['id'];
     name = json['name'];
+    name = utf8.decode(name.codeUnits);
     location = json['location'];
+    location = utf8.decode(location.codeUnits);
     isConnected = json['isConnected'];
-    lastSeen = json['lastSeen'];
+    if(json['lastSeen'] != null){
+      lastSeen = json['lastSeen'];
+    }else{
+      lastSeen = "null";
+    }
   }
 }

@@ -46,7 +46,7 @@ class _UserCardState extends State<UserCard> {
                     setState(() {
                       DataService.users[widget.index].isAdmin = value!;
                       selectedValue = value;
-                      userService.changeUserRole(widget.index, value);
+                      userService.changeUserRole(DataService.users[widget.index].userId, value);
                     });
                   },
                 )

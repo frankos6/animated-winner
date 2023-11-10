@@ -19,6 +19,7 @@ class UserService{
       Codec<String, String> stringToBase64 = utf8.fuse(base64);
       String encoded = stringToBase64.encode(credentials);
       encoded = "Basic $encoded";
+
       var response = await http.get(
           Uri.parse('${Config.ip}/auth'),
           headers: {"Authorization": "$encoded"}
@@ -41,9 +42,7 @@ class UserService{
           headers: {"Content-Type": "application/json"},
           body: jsonEncode(userData.toMap())
       );
-      if(response.statusCode == 201){
-        registered = true;
-      }
+      registered = true;
     } catch(e) {
       print(e);
     }
@@ -57,16 +56,16 @@ class UserService{
   }
 
   Future<void> changeUserRole(int userId, bool admin) async {
-    ///call to api to register endpoint
     try {
-      var response = await http.post(
-          Uri.parse('https://jsonplaceholder.typicode.com/posts/'),
-
+      var response = await http.put(
+          Uri.parse('${Config.ip}/user/$userId/admin'),
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": UserService.loginData
+          },
+          body: admin.toString()
       );
-      if(response.statusCode == 200 || response.statusCode == 201){
-        print(response.body);
 
-      }
     } catch(e) {
       print(e);
     }

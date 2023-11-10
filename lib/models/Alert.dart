@@ -10,4 +10,11 @@ class Alert{
     required this.timestamp,
     required this.payload
   });
+
+  Alert.fromJson(Map<String, dynamic> json){
+    alertId = json['id'];
+    deviceId = json['deviceId'];
+    timestamp = json['time'];
+    payload = json['payload'];
+  }
 }

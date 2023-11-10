@@ -351,7 +351,12 @@ app.get('/auth', [
 	authFn,
 	async (req, res) =>
 		res.send(
-			`Your credentials are correct!\nYou are logged in as ${req.username}.`,
+			(
+				await User.findOne({
+					where: { id: req.user.id },
+					attributes: ['id', 'username', 'isAdmin', 'createdAt'],
+				})
+			).toJSON(),
 		),
 ]);
 

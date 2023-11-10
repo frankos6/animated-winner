@@ -318,7 +318,7 @@ app.post('/device/register', async (req, res) => {
 		);
 		return newUser;
 	});
-	return res.send(201, { username, password });
+	res.send(201, { username, password });
 });
 
 app.post('/user/register', async (req, res) => {
@@ -342,14 +342,14 @@ app.post('/user/register', async (req, res) => {
 		throw new errors.ConflictError('This username is reserved for devices');
 	}
 	await User.create({ username, password });
-	return res.send(201);
+	res.send(201);
 });
 
 // endpoints with auth
 
 app.get('/auth', [
 	authFn,
-	async (req, res) =>
+	async (req, res) => {
 		res.send(
 			(
 				await User.findOne({
@@ -357,7 +357,8 @@ app.get('/auth', [
 					attributes: ['id', 'username', 'isAdmin', 'createdAt'],
 				})
 			).toJSON(),
-		),
+		);
+	},
 ]);
 
 // endpoints for users
@@ -365,26 +366,28 @@ app.get('/auth', [
 app.get('/alerts', [
 	authFn,
 	isUserFn,
-	async (req, res) =>
+	async (req, res) => {
 		res.send(
 			(
 				await Alert.findAll({
 					limit: req.query.limit || 10,
 					order: [['timestamp', 'DESC']],
-					attributes: ['payload', 'timestamp'],
+					attributes: ['message', 'timestamp'],
 				})
 			).map((e) => e.toJSON()),
-		),
+		);
+	},
 ]);
 
 app.get('/device/list', [
 	authFn,
 	isUserFn,
-	async (req, res) =>
+	async (req, res) => {
 		res.send(
 			(
 				await Device.findAll({
 					attributes: [
+						'id',
 						'name',
 						'location',
 						'isConnected',
@@ -393,14 +396,17 @@ app.get('/device/list', [
 					],
 				})
 			).map((e) => e.toJSON()),
-		),
+		);
+	},
 ]);
 
 app.get('/device/:id', [
 	authFn,
 	isUserFn,
 	deviceFn,
-	async (req, res) => res.send(req.paramDevice.toJSON()),
+	async (req, res) => {
+		res.send(req.paramDevice.toJSON());
+	},
 ]);
 
 app.del('/device/:id', [
@@ -436,7 +442,7 @@ app.get('/device/:id/alerts', [
 	authFn,
 	isUserFn,
 	deviceFn,
-	async (req, res) =>
+	async (req, res) => {
 		res.send(
 			(
 				await Alert.findAll({
@@ -446,14 +452,15 @@ app.get('/device/:id/alerts', [
 					},
 				})
 			).map((e) => e.toJSON()),
-		),
+		);
+	},
 ]);
 
 app.get('/device/:id/data', [
 	authFn,
 	isUserFn,
 	deviceFn,
-	async (req, res) =>
+	async (req, res) => {
 		res.send(
 			(
 				await DeviceData.findAll({
@@ -462,7 +469,8 @@ app.get('/device/:id/data', [
 					attributes: ['payload', 'timestamp'],
 				})
 			).map((e) => e.toJSON()),
-		),
+		);
+	},
 ]);
 
 // endpoints for admins
@@ -598,7 +606,7 @@ app.get('/user/list', [
 	authFn,
 	isUserFn,
 	adminFn,
-	async (req, res) =>
+	async (req, res) => {
 		res.send(
 			(
 				await User.findAll({
@@ -606,7 +614,8 @@ app.get('/user/list', [
 					attributes: ['id', 'username', 'isAdmin', 'createdAt'],
 				})
 			).map((e) => e.toJSON()),
-		),
+		);
+	},
 ]);
 
 // endpoints for devices

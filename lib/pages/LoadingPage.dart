@@ -53,7 +53,7 @@ class _LoadingState extends State<Loading> {
         decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.all(Radius.circular(10))),
-        child: SpinKitRing(
+        child: const SpinKitRing(
           color: Colors.blue,
         ),
       ),),

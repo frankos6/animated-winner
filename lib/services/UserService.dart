@@ -2,71 +2,58 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/DTO/UserLoginDTO.dart';
 import 'package:mobile_app/models/User.dart';
-import 'package:mobile_app/services/DataService.dart';
+import 'package:mobile_app/services/Config.dart';
 
 class UserService{
   UserService();
   static late User user;
   static bool loggedIn = false;
   static bool registered = false;
+  static String loginData = "";
 
 
   Future<void> getUserData(UserLoginDTO userData) async {
     ///request user data from api
     try {
-      var response = await http.post(
-          Uri.parse('https://jsonplaceholder.typicode.com/posts/'),
-          body: {'login': userData.login, 'password': userData.password}
+      String credentials = "${userData.login}:${userData.password}";
+      Codec<String, String> stringToBase64 = utf8.fuse(base64);
+      String encoded = stringToBase64.encode(credentials);
+      encoded = "Basic $encoded";
+      var response = await http.get(
+          Uri.parse('${Config.ip}/auth'),
+          headers: {"Authorization": "$encoded"}
       );
-      if(response.statusCode == 200 || response.statusCode == 201){
-        print(response.body);
-        //loggedIn = true;
 
+      if(response.statusCode == 200){
+        user = User.fromJson(jsonDecode(response.body));
+        loginData = encoded;
+        loggedIn = true;
       }
     } catch(e) {
       print(e);
-    }
-
-    ///test user
-    if(userData.password == "admin" && userData.login == "admin"){
-      loggedIn = true;
-      user = User(userId: 1, login: "admin", password: "admin", isAdmin: true);
-      return;
-    }else{
-      loggedIn = false;
-    }
-    if(userData.password == "user" && userData.login == "user"){
-      loggedIn = true;
-      user = User(userId: 2, login: "user", password: "user", isAdmin: false);
-      return;
-    }else{
-      loggedIn = false;
     }
   }
 
   Future<void> registerUser(UserLoginDTO userData) async {
-    ///call to api to register endpoint
     try {
       var response = await http.post(
-          Uri.parse('https://jsonplaceholder.typicode.com/posts/'),
-          body: {'login': userData.login, 'password': userData.password}
+          Uri.parse('${Config.ip}/user/register'),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode(userData.toMap())
       );
-      if(response.statusCode == 200 || response.statusCode == 201){
-        print(response.body);
-
+      if(response.statusCode == 201){
+        registered = true;
       }
     } catch(e) {
       print(e);
     }
-
-    ///test user
-    registered = true;
   }
 
   void logOut() {
     loggedIn = false;
     registered = false;
-    user = User(userId: 0, login: "", password: "", isAdmin: false);
+    user = User(userId: 0, login: "", isAdmin: false, created: "");
+    loginData = "";
   }
 
   Future<void> changeUserRole(int userId, bool admin) async {
@@ -83,8 +70,5 @@ class UserService{
     } catch(e) {
       print(e);
     }
-
-
   }
-
 }

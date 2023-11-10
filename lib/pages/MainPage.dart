@@ -23,6 +23,11 @@ class _MainPageState extends State<MainPage> {
       body: PageView(
         controller: pageController,
         pageSnapping: true,
+        onPageChanged: (value) {
+          setState(() {
+            currentPage = value;
+          });
+        },
         children: const [
           AllDevicesPage(),
           AlertsPage(),

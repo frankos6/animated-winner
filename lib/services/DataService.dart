@@ -49,12 +49,14 @@ class DataService{
       var response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts/1'));
       if(response.statusCode == 200){
         print(response.body);
-
+/*
         users = [
           User(userId: 1, login: "admin", password: "admin", isAdmin: true),
           User(userId: 2, login: "user", password: "user", isAdmin: false),
           User(userId: 3, login: "qwerty", password: "qwerty", isAdmin: false)
         ];
+
+ */
       }
     } catch(e) {
       print(e);

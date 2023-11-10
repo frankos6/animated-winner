@@ -5,7 +5,6 @@ import 'package:mobile_app/models/DeviceConfig.dart';
 import 'package:mobile_app/models/Humidity.dart';
 import 'package:mobile_app/models/Temperature.dart';
 import '../models/Device.dart';
-import 'DataService.dart';
 
 class DeviceService{
   late Device device;

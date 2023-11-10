@@ -23,10 +23,11 @@ class Device{
     };
   }
 
-  Device.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
-        name = json['name'],
-        location = json['location'],
-        isConnected = json['isConnected'],
-        lastSeen = json['lastSeen'];
+  Device.fromJson(Map<String, dynamic> json){
+    id = json['id'];
+    name = json['name'];
+    location = json['location'];
+    isConnected = json['isConnected'];
+    lastSeen = json['lastSeen'];
+  }
 }

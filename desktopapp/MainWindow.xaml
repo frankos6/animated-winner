@@ -6,7 +6,12 @@
         xmlns:local="clr-namespace:desktopapp"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
-    <Grid>
+    <StackPanel>
+        <Label Content="Username"></Label>
+        <TextBox x:Name="tbusername"></TextBox>
+        <Label Content="Password"></Label>
+        <TextBox x:Name="tbpassword"></TextBox>
+        <Button Content="LogIn" x:Name="btnlogin" Click="btnlogin_Click"></Button>
         
-    </Grid>
+    </StackPanel>
 </Window>

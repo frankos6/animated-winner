@@ -28,6 +28,14 @@ namespace desktopapp
             this.DataContext = new MainpageViewModel();
         }
 
+        private void tbusername_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            
+        }
 
+        private void tbpassword_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 }

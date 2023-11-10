@@ -14,9 +14,9 @@
     </Window.Resources>
     <StackPanel>
         <Label Content="Username"></Label>
-        <TextBox x:Name="tbusername"></TextBox>
+        <TextBox x:Name="tbusername" Text="{Binding Path=username,Source={StaticResource viewModel}}"></TextBox>
         <Label Content="Password"></Label>
-        <TextBox x:Name="tbpassword"></TextBox>
+        <TextBox x:Name="tbpassword" Text="{Binding Path=password,Source={StaticResource viewModel}}"></TextBox>
         <Button Content="LogIn" x:Name="btnlogin" Command="{Binding Path=logInCommand,Source={StaticResource viewModel}}"></Button>
         
     </StackPanel>

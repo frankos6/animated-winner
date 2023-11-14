@@ -12,16 +12,7 @@ namespace desktopapp.Models
         public double temp { get; set; }
         public double humidity { get; set; }
 
-        public Device(string devicelog) {
-        this.devicelog = devicelog;
-
-        
-        
-        }
-        public async void getdevice() { 
-        await Task.Delay(1000);
-           
-        }
+        public Device() {}
 
 
 

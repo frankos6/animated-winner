@@ -10,10 +10,10 @@ namespace desktopapp.Models
     public class User:UserViewModel
     {
 
-        public User(string username, string password)
+        public User(MainpageViewModel viewModel)
         { 
-        this.username = username;
-        this.password = password;
+        this.username = viewModel.username;
+        this.password = viewModel.password;
    
         }
 

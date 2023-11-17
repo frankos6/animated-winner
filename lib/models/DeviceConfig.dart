@@ -16,11 +16,21 @@ class DeviceConfig{
 });
 
   DeviceConfig.fromJson(Map<String, dynamic> json){
-    deviceId = json['deviceId'];
     dsf = json['frequency'];
     maxTemp = json['maxTemp'];
     minTemp = json['minTemp'];
-    maxHum = json['maxHum'];
-    minHum = json['minHum'];
+    maxHum = json['maxHumidity'];
+    minHum = json['minHumidity'];
   }
+
+ Map<String, dynamic> toMap(){
+    return {
+      "frequency": dsf,
+      "maxTemp": maxTemp,
+      "minTemp": minTemp,
+      "maxHumidity": maxHum,
+      "minHumidity": minHum
+    };
+ }
+
 }

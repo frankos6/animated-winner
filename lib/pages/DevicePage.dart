@@ -64,6 +64,7 @@ class _DevicePageState extends State<DevicePage> {
                               context,
                               MaterialPageRoute(
                                   builder: (context) => ConfigPage(
+                                    device: widget.device,
                                       deviceConfig: deviceService.config)));
                         }
                       }

@@ -19,7 +19,6 @@ class DeviceService{
 
   DeviceService({required this.device});
 
-
   Future<void> getConfig() async {
     try {
       var response = await http.get(
@@ -31,8 +30,9 @@ class DeviceService{
       );
       
       if(response.statusCode == 200){
-        
-        config = DeviceConfig.fromJson(jsonDecode(response.body));
+        var configJson = jsonDecode(response.body);
+        config = DeviceConfig.fromJson(configJson["params"]);
+        config.deviceId = device.id;
         gotConfig = true;
       }
     } catch(e) {
@@ -40,12 +40,18 @@ class DeviceService{
     }
   }
 
-  Future<void> updateConfig() async {
+  Future<void> updateConfig(DeviceConfig newConfig) async {
     try {
-      var response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts/1'));
+      var response = await http.put(
+        Uri.parse('${Config.ip}/device/${device.id}/config'),
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": UserService.loginData
+        },
+        body: jsonEncode(newConfig.toMap())
+      );
+
       if(response.statusCode == 200){
-
-
       }
     } catch(e) {
       print(e);
@@ -77,18 +83,26 @@ class DeviceService{
 
   Future<void> getData() async {
     try {
-      var response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts/1'));
+      var response = await http.get(
+          Uri.parse('${Config.ip}/device/${device.id}/data?limit=6'),
+          headers: {
+            "Accept": "application/json",
+            "Authorization": UserService.loginData
+          }
+      );
+
+      print(response.body);
       if(response.statusCode == 200){
-        //print(response.body);
         temperature = List<Temperature>.empty(growable: true);
         humidity = List<Humidity>.empty(growable: true);
 
+
+        //dummy data
         for (int i = 1; i < 7; i++) {
           temperature.add(Temperature(
               temperature: Random().nextInt(2) + 20,
               time: DateTime(2023, 10, 24, 9, i)));
         }
-
         for (int i = 1; i < 7; i++) {
           humidity.add(
             Humidity(humidity: Random().nextInt(20)+80, time: DateTime(2023, 10, 24, 9, i)),

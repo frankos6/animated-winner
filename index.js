@@ -372,7 +372,7 @@ app.get('/alerts', [
 				await Alert.findAll({
 					limit: req.query.limit || 10,
 					order: [['timestamp', 'DESC']],
-					attributes: ['message', 'timestamp'],
+					attributes: ['message', 'timestamp', 'DeviceId'],
 				})
 			).map((e) => e.toJSON()),
 		);
@@ -448,8 +448,8 @@ app.get('/device/:id/alerts', [
 				await Alert.findAll({
 					where: {
 						deviceId: req.params.id,
-						attributes: ['payload', 'timestamp'],
 					},
+					attributes: ['message', 'timestamp', 'DeviceId'],
 				})
 			).map((e) => e.toJSON()),
 		);

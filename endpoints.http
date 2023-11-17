@@ -10,7 +10,8 @@ POST localhost:245 /user/register
 Content-Type: application/json
 
 {
-  "username":"device7"
+  "username":"device7",
+  "password":"xd"
 }
 
 ### register device

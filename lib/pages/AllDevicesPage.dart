@@ -84,17 +84,21 @@ class _AllDevicesPageState extends State<AllDevicesPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text(
-                                  DataService.devices[index].isConnected
-                                      ? "Połączony"
-                                      : "Niepołączony",
-                                  style: TextStyle(
-                                      color:
-                                          DataService.devices[index].isConnected
-                                              ? Colors.green[600]
-                                              : Colors.redAccent)),
-                              Text(
-                                  "Ostatnio widziano: ${DataService.devices[index].lastSeen}")
+                              Expanded(
+                                child: Text(
+                                    DataService.devices[index].isConnected
+                                        ? "Połączony"
+                                        : "Niepołączony",
+                                    style: TextStyle(
+                                        color:
+                                            DataService.devices[index].isConnected
+                                                ? Colors.green[600]
+                                                : Colors.redAccent)),
+                              ),
+                              Expanded(
+                                child: Text(
+                                    "Ostatnio widziano: \n ${DataService.devices[index].lastSeen}"),
+                              )
                             ],
                           )
                         ],

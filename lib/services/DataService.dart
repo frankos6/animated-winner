@@ -47,7 +47,6 @@ class DataService{
       );
 
       if(response.statusCode == 200){
-        print(response.body);
 
         alerts = List<Alert>.empty(growable: true);
         List alertsJson = jsonDecode(response.body);

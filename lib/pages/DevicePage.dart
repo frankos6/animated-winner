@@ -23,8 +23,7 @@ class _DevicePageState extends State<DevicePage> {
   bool gotData = false;
 
   getData() async {
-
-    await deviceService.getConfig(widget.device.id);
+    await deviceService.getConfig();
     await deviceService.getAlerts();
     await deviceService.getData();
     if (context.mounted) {
@@ -36,6 +35,7 @@ class _DevicePageState extends State<DevicePage> {
 
   @override
   void initState() {
+    /// TODO: change req admin to edit
     super.initState();
     gotData = false;
     deviceService = DeviceService(device: widget.device);
@@ -55,8 +55,7 @@ class _DevicePageState extends State<DevicePage> {
                     getData();
                   },
                   icon: const Icon(Icons.refresh)),
-              if (UserService.user.isAdmin &&
-                  widget.device.isConnected)
+              ///if (UserService.user.isAdmin && widget.device.isConnected) ////////////////////////////////////////////////////////////
                 IconButton(
                     onPressed: () {
                       if (context.mounted) {

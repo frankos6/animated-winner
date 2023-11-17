@@ -20,11 +20,10 @@ class DeviceService{
   DeviceService({required this.device});
 
 
-  Future<void> getConfig(int deviceId) async {
+  Future<void> getConfig() async {
     try {
-      print(deviceId);
       var response = await http.get(
-          Uri.parse('${Config.ip}/device/$deviceId/config'),
+          Uri.parse('${Config.ip}/device/${device.id}/config'),
           headers: {
             "Accept": "application/json",
             "Authorization": UserService.loginData
@@ -55,15 +54,22 @@ class DeviceService{
 
   Future<void> getAlerts() async {
     try {
-      var response = await http.get(Uri.parse('https://jsonplaceholder.typicode.com/posts/1'));
-      if(response.statusCode == 200){
+      var response = await http.get(
+          Uri.parse('${Config.ip}/device/${device.id}/alerts'),
+          headers: {
+            "Accept": "application/json",
+            "Authorization": UserService.loginData
+          }
+      );
 
-        /// alerts order by date time
-        alerts = [
-          Alert(alertId: 3, deviceId: device.id, timestamp: "12:33", payload: "wet"),
-          Alert(alertId: 4, deviceId: device.id, timestamp: "12:37", payload: "Overheat"),
-        ];
+      alerts = List<Alert>.empty(growable: true);
+      List alertsJson = jsonDecode(response.body);
+      alertsJson = alertsJson.reversed.toList();
+
+      for(int i = 0; i < alertsJson.length; i++){
+        alerts.add(Alert.fromJson(alertsJson[i]));
       }
+
     } catch(e) {
       print(e);
     }

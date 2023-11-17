@@ -33,9 +33,10 @@ class Device{
     location = utf8.decode(location.codeUnits);
     isConnected = json['isConnected'];
     if(json['lastSeen'] != null){
-      lastSeen = json['lastSeen'];
+      DateTime date = DateTime.parse(json['lastSeen']);
+      lastSeen = "${date.day}.${date.month}.${date.year} o ${date.hour}:${date.minute}:${date.second}";
     }else{
-      lastSeen = "null";
+      lastSeen = 'null';
     }
   }
 }

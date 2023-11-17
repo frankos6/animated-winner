@@ -99,7 +99,7 @@ class _AlertsPageState extends State<AlertsPage> {
                           ),
                           Expanded(
                             child: Column(children: [
-                              Text("${alerts[index].payload}",
+                              Text(alerts[index].payload,
                                   style: const TextStyle(
                                       fontSize: 18, fontWeight: FontWeight.bold)),
                               Text("${alerts[index].timestamp}",

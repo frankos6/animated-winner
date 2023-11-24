@@ -12,24 +12,29 @@
     <Window.Resources>
         <viewmodel:MainpageViewModel x:Key="viewModel"/>
     </Window.Resources>
-    <StackPanel Orientation="Horizontal">
-        <GroupBox Header="LogIn">
-            <StackPanel Width="390">
-                <Label Content="Username"></Label>
-                <TextBox x:Name="tbusername" Text="{Binding Path=username,Source={StaticResource viewModel}}"></TextBox>
-                <Label Content="Password"></Label>
-                <TextBox x:Name="tbpassword" Text="{Binding Path=password,Source={StaticResource viewModel}}"></TextBox>
-                <Button Content="LogIn" x:Name="btnlogin" Command="{Binding Path=logInCommand,Source={StaticResource viewModel}}"></Button>
-            </StackPanel>
-        </GroupBox>
-        <GroupBox Header="Register" Width="390">
-            <StackPanel>
-                <Label Content="Register username" ></Label>
-                <TextBox x:Name="tbregusername" Text="{Binding Path=regusername,Source={StaticResource viewModel}}" ></TextBox>
-                <Label Content="Register password"></Label>
-                <TextBox x:Name="tbregpassword" Text="{Binding Path=regpassword,Source={StaticResource viewModel}}" ></TextBox>
-                <Button x:Name="btnregister" Content="Register" Command="{Binding Path=registerCommand,Source={StaticResource viewModel}}" ></Button>
-            </StackPanel>
-        </GroupBox>
+    <StackPanel>
+        <StackPanel Orientation="Horizontal" x:Name="loginopt" Visibility="Visible">
+            <GroupBox Header="LogIn">
+                <StackPanel Width="390">
+                    <Label Content="Username"></Label>
+                    <TextBox x:Name="tbusername" Text="{Binding Path=username,Source={StaticResource viewModel}}"></TextBox>
+                    <Label Content="Password"></Label>
+                    <TextBox x:Name="tbpassword" Text="{Binding Path=password,Source={StaticResource viewModel}}"></TextBox>
+                    <Button Content="LogIn" x:Name="btnlogin" Click="btnlogin_Click"></Button>
+                </StackPanel>
+            </GroupBox>
+            <GroupBox Header="Register" Width="390">
+                <StackPanel>
+                    <Label Content="Register username" ></Label>
+                    <TextBox x:Name="tbregusername" Text="{Binding Path=regusername,Source={StaticResource viewModel}}" ></TextBox>
+                    <Label Content="Register password"></Label>
+                    <TextBox x:Name="tbregpassword" Text="{Binding Path=regpassword,Source={StaticResource viewModel}}" ></TextBox>
+                    <Button x:Name="btnregister" Content="Register" Command="{Binding Path=registerCommand,Source={StaticResource viewModel}}" ></Button>
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+        <StackPanel x:Name="loggedopt" Visibility="Collapsed">
+            <Label Content="Succesful logged"></Label>
+        </StackPanel>
     </StackPanel>
 </Window>

@@ -66,3 +66,5 @@ C:\Users\devdb\Desktop\desktopapp\desktopapp\obj\Debug\desktopapp.exe
 C:\Users\devdb\Desktop\desktopapp\desktopapp\obj\Debug\desktopapp.pdb
 C:\Users\devdb\Desktop\desktopapp\desktopapp\obj\Debug\Views\SecondPage.g.cs
 C:\Users\devdb\Desktop\desktopapp\desktopapp\obj\Debug\Views\SecondPage.baml
+C:\Users\devdb\Desktop\smt\desktopapp\obj\Debug\Views\SecondPage.g.cs
+C:\Users\devdb\Desktop\smt\desktopapp\obj\Debug\Views\SecondPage.baml

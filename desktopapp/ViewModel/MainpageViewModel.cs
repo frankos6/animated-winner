@@ -27,7 +27,6 @@ namespace desktopapp.ViewModel
         public int acces { get; set; }
         public LogInCommand logInCommand { get; set; }
         public RegisterCommand registerCommand { get; set; }
-        public MainWindow MainWindow { get; set; }
 
         /*LogIn- 
          * hashing the values and awaiting getacces
@@ -68,7 +67,7 @@ namespace desktopapp.ViewModel
         }
         public async Task<int> getacces(string base64code)
         {
-
+            int result = 0;
             using (var client = new HttpClient())
             {
                 client.BaseAddress= new Uri("http://192.168.137.80:245");
@@ -79,22 +78,17 @@ namespace desktopapp.ViewModel
                 HttpResponseMessage responseMessage = await client.GetAsync("/auth");
                 if (responseMessage.IsSuccessStatusCode)
                 {
-                    MainWindow.changepage(user1);
-                
+                    result = 1;
                 }
 
             }
-
-
-            await Task.Delay(1000);
-            return 0;
+            return result;
 
         }
         public MainpageViewModel(MainWindow main)
         {
             this.logInCommand = new LogInCommand(this);
             this.registerCommand = new RegisterCommand(this);
-            MainWindow = main;
         }
         public MainpageViewModel()
         {

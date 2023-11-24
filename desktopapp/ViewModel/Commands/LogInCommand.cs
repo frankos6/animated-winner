@@ -25,7 +25,7 @@ namespace desktopapp.ViewModel.Commands
 
         public async void Execute(object parameter)
         {
-            await MainpageViewModel.LogIn();
+            int result = await MainpageViewModel.LogIn();
         }
 
 

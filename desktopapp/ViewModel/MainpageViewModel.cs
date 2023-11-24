@@ -27,6 +27,7 @@ namespace desktopapp.ViewModel
         public int acces { get; set; }
         public LogInCommand logInCommand { get; set; }
         public RegisterCommand registerCommand { get; set; }
+        public string httpadress = "http://192.168.137.51:245";
 
         /*LogIn- 
          * hashing the values and awaiting getacces
@@ -46,7 +47,7 @@ namespace desktopapp.ViewModel
         }
         public async void Register() {
 
-            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create("http://192.168.137.80:245/user/register");
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(httpadress+"/user/register");
             httpWebRequest.Method = "POST";
             httpWebRequest.ContentType = "application/json";
 
@@ -70,7 +71,7 @@ namespace desktopapp.ViewModel
             int result = 0;
             using (var client = new HttpClient())
             {
-                client.BaseAddress= new Uri("http://192.168.137.80:245");
+                client.BaseAddress= new Uri(httpadress);
                 client.DefaultRequestHeaders.Clear();
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
                 client.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", "Basic " + base64code);
@@ -85,6 +86,29 @@ namespace desktopapp.ViewModel
             return result;
 
         }
+
+        public async Task<Device> getdata(string base64code)
+        {
+            await Task.Delay(1000);
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(httpadress + "/device/1");
+            httpWebRequest.Method = "GET";
+            httpWebRequest.ContentType = "application/json";
+
+            using (StreamWriter streamwriter = new StreamWriter(httpWebRequest.GetRequestStream()))
+            {
+                string json = "{\"username\":\"" + regusername + "\",\"password\":\"" + regpassword + "\"}";
+                streamwriter.Write(json);
+            }
+            var response = await httpWebRequest.GetResponseAsync();
+            using (StreamReader streamReader = new StreamReader(response.GetResponseStream()))
+            {
+                var result = streamReader.ReadToEnd();
+
+                return new Device();
+            }
+        }
+
+
         public MainpageViewModel(MainWindow main)
         {
             this.logInCommand = new LogInCommand(this);

@@ -35,11 +35,6 @@ namespace desktopapp
             this.DataContext = MainpageViewModel;
         }
 
-        public async void changepage(User user) {
-            SecondPage secondPage = new SecondPage(user);
-            this.Content = secondPage;
-        
-        }
 
         private async void btnlogin_Click(object sender, RoutedEventArgs e)
         {
@@ -55,6 +50,14 @@ namespace desktopapp
 
             
             }
+
+        }
+
+        private void btngetbyid_Click(object sender, RoutedEventArgs e)
+        {
+
+
+
 
         }
     }

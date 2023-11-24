@@ -34,6 +34,17 @@
             </GroupBox>
         </StackPanel>
         <StackPanel x:Name="loggedopt" Visibility="Collapsed">
+            <Label Content="Get device by id"></Label>
+            <TextBox x:Name="tbdeviceid"></TextBox>
+            <Button x:Name="btngetbyid" Click="btngetbyid_Click"></Button>
+
+            <ListView>
+                
+            </ListView>
+            
+            
+            
+            
             <Label Content="Succesful logged"></Label>
         </StackPanel>
     </StackPanel>

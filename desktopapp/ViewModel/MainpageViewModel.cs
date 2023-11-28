@@ -15,6 +15,7 @@ using System.Net;
 using System.IO;
 using desktopapp.Views;
 using desktopapp.Models;
+using System.Collections.ObjectModel;
 
 namespace desktopapp.ViewModel
 {
@@ -27,7 +28,8 @@ namespace desktopapp.ViewModel
         public int acces { get; set; }
         public LogInCommand logInCommand { get; set; }
         public RegisterCommand registerCommand { get; set; }
-        public string httpadress = "http://192.168.137.51:245";
+        public string httpadress = "http://192.168.0.227:245";
+        public ObservableCollection<Device> devices { get; set; }
 
         /*LogIn- 
          * hashing the values and awaiting getacces
@@ -113,11 +115,16 @@ namespace desktopapp.ViewModel
         {
             this.logInCommand = new LogInCommand(this);
             this.registerCommand = new RegisterCommand(this);
+            
+            
+
+
         }
         public MainpageViewModel()
         {
             this.logInCommand = new LogInCommand(this);
             this.registerCommand = new RegisterCommand(this);
+
         }
 
         }

@@ -11,6 +11,7 @@ namespace desktopapp.Models
         public string devicelog { get; set; }
         public double temp { get; set; }
         public double humidity { get; set; }
+        public string alertmessage { get; set; }
 
         public Device() {}
 

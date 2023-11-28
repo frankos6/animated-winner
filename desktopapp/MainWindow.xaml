@@ -38,8 +38,35 @@
             <TextBox x:Name="tbdeviceid"></TextBox>
             <Button x:Name="btngetbyid" Click="btngetbyid_Click"></Button>
 
-            <ListView>
-                
+            <ListView x:Name="lwdata" >
+                <ListView.View>
+                    <GridView >
+                        <GridViewColumn Header="temperature" >
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding temp}"></Label>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                        </GridViewColumn>
+                        <GridViewColumn Header="humidity">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding humidity}"></Label>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                            
+                            
+                        </GridViewColumn>
+                        <GridViewColumn Header="alert message">
+                            <GridViewColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Label Content="{Binding alertmessage}"></Label>
+                                </DataTemplate>
+                            </GridViewColumn.CellTemplate>
+                            
+                        </GridViewColumn>
+                    </GridView>
+                </ListView.View>
             </ListView>
             
             

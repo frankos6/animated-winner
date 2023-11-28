@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/Alert.dart';
 import 'package:mobile_app/models/Device.dart';

@@ -91,24 +91,19 @@ class DeviceService{
           }
       );
 
-      print(response.body);
+      print("data ${response.body}");
+
       if(response.statusCode == 200){
         temperature = List<Temperature>.empty(growable: true);
         humidity = List<Humidity>.empty(growable: true);
 
+        var data = jsonDecode(response.body);
 
-        //dummy data
-        for (int i = 1; i < 7; i++) {
-          temperature.add(Temperature(
-              temperature: Random().nextInt(2) + 20,
-              time: DateTime(2023, 10, 24, 9, i)));
+        for(int i = 0; i < data.length; i++){
+          DateTime timestamp =  DateTime.parse(data[i]["timestamp"]);
+          temperature.add(Temperature(temperature: data[i]["payload"]["temperature"], time: timestamp));
+          humidity.add(Humidity(humidity: data[i]["payload"]["humidity"], time: timestamp));
         }
-        for (int i = 1; i < 7; i++) {
-          humidity.add(
-            Humidity(humidity: Random().nextInt(20)+80, time: DateTime(2023, 10, 24, 9, i)),
-          );
-        }
-
       }
     } catch(e) {
       print(e);

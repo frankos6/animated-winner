@@ -35,7 +35,6 @@ class _DevicePageState extends State<DevicePage> {
 
   @override
   void initState() {
-    /// TODO: change req admin to edit
     super.initState();
     gotData = false;
     deviceService = DeviceService(device: widget.device);
@@ -55,7 +54,7 @@ class _DevicePageState extends State<DevicePage> {
                     getData();
                   },
                   icon: const Icon(Icons.refresh)),
-              ///if (UserService.user.isAdmin && widget.device.isConnected) ////////////////////////////////////////////////////////////
+              if (UserService.user.isAdmin && widget.device.isConnected)
                 IconButton(
                     onPressed: () {
                       if (context.mounted) {
@@ -177,7 +176,6 @@ class _DevicePageState extends State<DevicePage> {
                   ),
                   SfCartesianChart(
                     title: ChartTitle(text: "Temperatura"),
-                    tooltipBehavior: tooltipBehavior,
                     primaryXAxis: CategoryAxis(
                       majorGridLines: const MajorGridLines(width: 0),
                     ),
@@ -185,7 +183,11 @@ class _DevicePageState extends State<DevicePage> {
                   ),
                   SfCartesianChart(
                     title: ChartTitle(text: "Wilgotność"),
-                    tooltipBehavior: tooltipBehavior,
+                    primaryYAxis: CategoryAxis(
+                        maximum: 100,
+                        minimum: 0,
+                        majorGridLines: const MajorGridLines(width: 1),
+                    ),
                     primaryXAxis: CategoryAxis(
                       majorGridLines: const MajorGridLines(width: 0),
                     ),

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,11 @@ namespace desktopapp.Models
         public double temp { get; set; }
         public double humidity { get; set; }
         public string alertmessage { get; set; }
+
+        [JsonProperty("payload")]
+        public string payload { get; set; }
+        [JsonProperty("timestamp")]
+        public string timestamp { get; set; }
 
         public Device() {}
 

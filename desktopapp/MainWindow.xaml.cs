@@ -22,7 +22,8 @@ using desktopapp.Models;
 using desktopapp.ViewModel;
 using desktopapp.ViewModel.Commands;
 using desktopapp.Views;
-
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 namespace desktopapp
 {
     /// <summary>
@@ -93,16 +94,64 @@ namespace desktopapp
             bool smt = false;
             string data2 = data;
             while (smt == false)
-            { 
-                int startindex = data.IndexOf("{\"t");
-            int separatorindex = data.IndexOf("},\"t");
-                char x = data.ElementAt(separatorindex);
-                char y = data.ElementAt(separatorindex + 1);
-                char z = data.ElementAt(separatorindex -1);
-                string oneobject = data2.Substring(startindex, separatorindex+1-startindex);
-                data2 = data2.Remove(0,separatorindex);
+            {
+                JArray a = JArray.Parse(data);
+                foreach (JObject o in a.Children<JObject>())
+                {
+                    foreach (JProperty p in o.Properties())
+                    {
+                        string x = p.Name;
+                        if (p.Name != "timestamp")
+                        {
+                            JObject o2 = JObject.Parse(p.Value.ToString());
+                            double temperature = 0;
+                            double hum = 0;
+                            foreach (JProperty p2 in o2.Properties())
+                            {
+                                x = p2.Name;
+                                string xx = p2.Value.ToString();
+                                if (p2.Name == "temperature")
+                                {
+                                    temperature = (double)p2.Value;
+                                }
+                                else
+                                {
+                                    hum = (double)p2.Value;
+                                }
+                            }
 
-                Device device = new Device() ;
+                            Device device = new Device();
+                            device.temp = temperature;
+                            device.humidity = hum;
+                            device.alertmessage = "Ok";
+                            devices.Add(device);
+                        }
+                        //JArray z  = JArray.Parse(p.Value.ToString());
+                        //foreach (JObject o2 in z.Children<JObject>())
+                        //{
+                        //    foreach (JProperty p2 in o2.Properties())
+                        //    { 
+                        //    string zz = p2.Name;
+                        //        string zzz = p2.Value.ToString();
+                        //    }
+
+                        //}
+
+
+                    }
+                }
+
+
+            //    int startindex = data.IndexOf("{\"t");
+            //int separatorindex = data.IndexOf("},\"t");
+            //    char x = data.ElementAt(separatorindex);
+            //    char y = data.ElementAt(separatorindex + 1);
+            //    char z = data.ElementAt(separatorindex -1);
+            //    string oneobject = data2.Substring(startindex, separatorindex+1-startindex);
+            //    data2 = data2.Remove(0,separatorindex);
+            //    int sepindex = data.IndexOf(':');
+
+                
                
                 smt = true;  
             

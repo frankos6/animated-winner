@@ -68,3 +68,5 @@ C:\Users\devdb\Desktop\desktopapp\desktopapp\obj\Debug\Views\SecondPage.g.cs
 C:\Users\devdb\Desktop\desktopapp\desktopapp\obj\Debug\Views\SecondPage.baml
 C:\Users\devdb\Desktop\smt\desktopapp\obj\Debug\Views\SecondPage.g.cs
 C:\Users\devdb\Desktop\smt\desktopapp\obj\Debug\Views\SecondPage.baml
+C:\Users\devdb\Desktop\smt\desktopapp\bin\Debug\Newtonsoft.Json.dll
+C:\Users\devdb\Desktop\smt\desktopapp\bin\Debug\Newtonsoft.Json.xml

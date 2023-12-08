@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:mobile_app/models/DTO/UserLoginDTO.dart';
 import 'package:mobile_app/pages/LoadingPage.dart';
+import 'package:mobile_app/services/Config.dart';
 import 'package:mobile_app/services/Themes.dart';
 import 'package:mobile_app/services/UserService.dart';
 
@@ -15,21 +16,47 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _loginController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  TextEditingController ipController = TextEditingController();
   bool showErrorMessage = false;
   bool showRegisterMessage = false;
   bool buttonsEnabled = true;
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
+    ipController.text = Config.ip;
+
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: ()=>showDialog(
+          builder: (context) => Dialog(
+            child: Container(
+              height: 200,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const Text("Adres ip", style: TextStyle(fontWeight: FontWeight.bold)),
+                    TextFormField(
+                      controller: ipController,
+                    ),
+                    ElevatedButton(onPressed: (){
+                      Config.ip = ipController.text;
+                      Navigator.of(context).pop();
+                    }, child: const Text("OK"))
+                  ],
+                ),
+              ),
+            ),
+          ),
+          context: context,
+        ),
+        backgroundColor: Colors.white,
+        child: const Icon(Icons.settings, color: Colors.blue),
+      ),
       body: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+        padding: const EdgeInsets.all(20),
         height: double.infinity,
         width: double.infinity,
         decoration: BoxDecoration(

@@ -54,7 +54,7 @@ class _DevicePageState extends State<DevicePage> {
                     getData();
                   },
                   icon: const Icon(Icons.refresh)),
-              if (UserService.user.isAdmin && widget.device.isConnected)
+              if (UserService.user.isAdmin && widget.device.isConnected && deviceService.config != null)
                 IconButton(
                     onPressed: () {
                       if (context.mounted) {
@@ -102,7 +102,7 @@ class _DevicePageState extends State<DevicePage> {
                                   style: const TextStyle(fontSize: 16)),
                               if (deviceService.gotConfig)
                                 Text(
-                                    "Częstotliwość wysyłania danych: ${deviceService.config.dsf}",
+                                    "Częstotliwość wysyłania danych: ${deviceService.config?.dsf}",
                                     style: const TextStyle(fontSize: 16)),
                             ],
                           ),
@@ -121,11 +121,11 @@ class _DevicePageState extends State<DevicePage> {
                                   style: const TextStyle(fontSize: 16)),
                               if (deviceService.gotConfig)
                                 Text(
-                                    "Max. temperatura: ${deviceService.config.maxTemp}°C",
+                                    "Max. temperatura: ${deviceService.config?.maxTemp}°C",
                                     style: const TextStyle(fontSize: 16)),
                               if (deviceService.gotConfig)
                                 Text(
-                                    "Max. wilgotność: ${deviceService.config.maxHum}%",
+                                    "Max. wilgotność: ${deviceService.config?.maxHum}%",
                                     style: const TextStyle(fontSize: 16)),
                             ],
                           ),
@@ -141,39 +141,47 @@ class _DevicePageState extends State<DevicePage> {
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold))),
-                  SizedBox(
-                    height: 160,
-                    child: ListView.builder(
-                        itemCount: deviceService.alerts.length,
-                        itemBuilder: (context, index) {
-                          return Card(
-                            shape: const RoundedRectangleBorder(
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(15))),
-                            margin: const EdgeInsets.all(10),
-                            color: Colors.white,
-                            child: Container(
-                                padding: const EdgeInsets.all(20),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    const Icon(Icons.warning,
-                                        color: Colors.redAccent),
-                                    const SizedBox(width: 10),
-                                    Text(
-                                        "${deviceService.alerts[index].timestamp}: ",
-                                        style: const TextStyle(fontSize: 16)),
-                                    Expanded(
-                                      child: Text(
-                                          "${deviceService.alerts[index].payload}",
+                  if(deviceService.alerts.isNotEmpty)
+                    SizedBox(
+                      height: 160,
+                      child: ListView.builder(
+                          itemCount: deviceService.alerts.length,
+                          itemBuilder: (context, index) {
+                            return Card(
+                              shape: const RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15))),
+                              margin: const EdgeInsets.all(10),
+                              color: Colors.white,
+                              child: Container(
+                                  padding: const EdgeInsets.all(20),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      const Icon(Icons.warning,
+                                          color: Colors.redAccent),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                          "${deviceService.alerts[index].timestamp}: ",
                                           style: const TextStyle(fontSize: 16)),
-                                    )
-                                  ],
-                                )),
-                          );
-                        }),
-                  ),
+                                      Expanded(
+                                        child: Text(
+                                            deviceService.alerts[index].payload,
+                                            style: const TextStyle(fontSize: 16)),
+                                      )
+                                    ],
+                                  )),
+                            );
+                          }),
+                    ),
+                  if(deviceService.alerts.isEmpty)
+                    const SizedBox(
+                      height: 160,
+                      child: Center(
+                        child: Text("Brak alertów"),
+                      ),
+                    ),
                   SfCartesianChart(
                     title: ChartTitle(text: "Temperatura"),
                     primaryXAxis: CategoryAxis(

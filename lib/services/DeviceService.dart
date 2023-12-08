@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 import 'package:http/http.dart' as http;
 import 'package:mobile_app/models/Alert.dart';
 import 'package:mobile_app/models/DeviceConfig.dart';
@@ -11,7 +10,7 @@ import 'UserService.dart';
 
 class DeviceService{
   late Device device;
-  late DeviceConfig config;
+  DeviceConfig? config;
   List<Alert> alerts = List<Alert>.empty(growable: true);
   List<Temperature> temperature = List<Temperature>.empty(growable: true);
   List<Humidity> humidity = List<Humidity>.empty(growable: true);
@@ -30,13 +29,15 @@ class DeviceService{
       );
       
       if(response.statusCode == 200){
-        var configJson = jsonDecode(response.body);
-        config = DeviceConfig.fromJson(configJson["params"]);
-        config.deviceId = device.id;
-        gotConfig = true;
+        Map<String, dynamic> configJson = jsonDecode(response.body);
+        if(configJson.isNotEmpty) {
+          config = DeviceConfig.fromJson(configJson["params"]);
+          config?.deviceId = device.id;
+          gotConfig = true;
+        }
       }
     } catch(e) {
-      print(e);
+      print("deviceService config fetch: $e");
     }
   }
 
@@ -54,7 +55,7 @@ class DeviceService{
       if(response.statusCode == 200){
       }
     } catch(e) {
-      print(e);
+      print("deviceService config update: $e");
     }
   }
 
@@ -77,7 +78,7 @@ class DeviceService{
       }
 
     } catch(e) {
-      print(e);
+      print("deviceService alerts fetch: $e");
     }
   }
 
@@ -91,8 +92,6 @@ class DeviceService{
           }
       );
 
-      print("data ${response.body}");
-
       if(response.statusCode == 200){
         temperature = List<Temperature>.empty(growable: true);
         humidity = List<Humidity>.empty(growable: true);
@@ -101,12 +100,12 @@ class DeviceService{
 
         for(int i = 0; i < data.length; i++){
           DateTime timestamp =  DateTime.parse(data[i]["timestamp"]);
-          temperature.add(Temperature(temperature: data[i]["payload"]["temperature"], time: timestamp));
-          humidity.add(Humidity(humidity: data[i]["payload"]["humidity"], time: timestamp));
+          temperature.add(Temperature(temperature: double.parse(data[i]["payload"]["Temperature"]), time: timestamp));
+          humidity.add(Humidity(humidity: double.parse(data[i]["payload"]["Humidity"]), time: timestamp));
         }
       }
     } catch(e) {
-      print(e);
+      print("deviceService data fetch: $e");
     }
   }
 

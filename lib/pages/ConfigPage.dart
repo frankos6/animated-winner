@@ -6,7 +6,7 @@ import '../models/Device.dart';
 import '../services/DataService.dart';
 
 class ConfigPage extends StatefulWidget {
-  final DeviceConfig deviceConfig;
+  final DeviceConfig? deviceConfig;
   final Device device;
   const ConfigPage({super.key, required this.deviceConfig, required this.device});
 
@@ -32,7 +32,7 @@ class _ConfigPageState extends State<ConfigPage> {
   @override
   void initState() {
     device = widget.device;
-    deviceConfig = widget.deviceConfig;
+    deviceConfig = widget.deviceConfig!;
     nameController = TextEditingController(text: device.name);
     locationController = TextEditingController(text: device.location);
     dataSendFreqController = TextEditingController(text: "${deviceConfig.dsf}");

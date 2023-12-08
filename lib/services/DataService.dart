@@ -31,7 +31,7 @@ class DataService{
         }
       }
     } catch(e) {
-      print(e);
+      print("device fetch: ${e}");
     }
   }
 

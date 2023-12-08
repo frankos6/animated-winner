@@ -29,8 +29,12 @@ class Device{
     id = json['id'];
     name = json['name'];
     name = utf8.decode(name.codeUnits);
-    location = json['location'];
-    location = utf8.decode(location.codeUnits);
+    if(json['location'] == null){
+      location = "";
+    }else {
+      location = json['location'];
+      location = utf8.decode(location.codeUnits);
+    }
     isConnected = json['isConnected'];
     if(json['lastSeen'] != null){
       DateTime date = DateTime.parse(json['lastSeen']);

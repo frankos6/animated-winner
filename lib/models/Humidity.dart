@@ -1,6 +1,6 @@
 class Humidity{
   final DateTime time;
-  final int humidity;
+  final double humidity;
 
   Humidity({required this.humidity, required this.time});
 
